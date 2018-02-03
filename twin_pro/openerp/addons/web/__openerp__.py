@@ -58,6 +58,7 @@ This module provides the core of the OpenERP Web Client.
         "static/src/js/view_list.js",
         "static/src/js/view_list_editable.js",
         "static/src/js/view_tree.js",
+        "static/src/js/custom.js",
     ],
     'css' : [
         "static/lib/jquery.ui.bootstrap/css/custom-theme/jquery-ui-1.9.0.custom.css",

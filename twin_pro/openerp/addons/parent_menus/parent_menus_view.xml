@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+		<!--Parent Masters Menus -->
+		
+		<menuitem name="Masters" id="mpm_masters" sequence="2"/>
+			<menuitem name="Purchase-Inventory" parent="mpm_masters" id="mrm_po_inv_masters" sequence="2"/>
+		
+    </data>
+</openerp>

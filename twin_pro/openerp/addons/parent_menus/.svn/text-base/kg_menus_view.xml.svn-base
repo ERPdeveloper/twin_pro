@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+		
+		
+				
+		<!-- CRM Menu -->
+		
+		<menuitem name="CRM" id="cpm_crm" sequence="19"/>
+		
+			<!-- CRM Master Menu -->
+			<menuitem id="cpm_crm_master_menu" name="Masters" parent="cpm_crm" sequence="1"/>
+				
+				<!-- Contractor Master  -->
+				<menuitem action="kg_partners.kg_action_contractor_form_1" name="Contractor" id="mam_contractor_master123" parent="kg_pumpmodel_master.mpm_planning_master" sequence="19"/>
+				
+			<!-- CRM Enquiry Menu -->
+			<menuitem id="cpm_crm_enquiry_menu" name="Enquiry" parent="cpm_crm" sequence="2"/>
+			
+			<!-- CRM Enquiry North Menu -->
+            <menuitem name="North" id="tpm_crm_enquiry_north" parent = "cpm_crm" sequence="3"/>
+            
+			<!-- CRM Enquiry South Menu -->
+            <menuitem name="South" id="tpm_crm_enquiry_south" parent = "cpm_crm" sequence="4"/>
+            
+			<!-- CRM Enquiry East Menu -->
+            <menuitem name="East" id="tpm_crm_enquiry_east" parent = "cpm_crm" sequence="5"/>
+            
+			<!-- CRM Enquiry West Menu -->
+            <menuitem name="West" id="tpm_crm_enquiry_west" parent = "cpm_crm" sequence="6"/>
+            
+			<!-- CRM Enquiry Mines Menu -->
+            <menuitem name="Mines" id="tpm_crm_enquiry_mines" parent = "cpm_crm" sequence="7"/>
+            
+			<!-- CRM Enquiry Export Menu -->
+            <menuitem name="Export" id="tpm_crm_enquiry_export" parent = "cpm_crm" sequence="8"/>
+            
+			<!-- CRM Enquiry IPD Menu -->
+            <menuitem name="IPD" id="tpm_crm_enquiry_ipd" parent = "cpm_crm" sequence="9"/>
+            
+
+				
+				<!-- Chemical Master  --> 
+				<menuitem action="kg_chemical_master.cma_chemical_master" name="Chemical" id="cam_crm_chemical_master" parent="cpm_crm_master_menu" sequence="7"/>
+				
+			<!-- CRM Enquiry Menu -->
+			<menuitem id="cpm_crm_enquiry_menu" name="Enquiry" parent="cpm_crm" sequence="2"/>
+							
+		<!-- Indent Menu -->
+		
+		<menuitem name="Indents" id="ipm_indent" sequence="20"/>
+		
+				<!-- Indent Transaction Menu -->
+				<menuitem id="ipm_dep_indent_menu" name="Department Indent" parent="ipm_indent" sequence="1"/>
+				
+				<!-- Purchase Transaction Menu -->
+				<menuitem id="ipm_purchase_indent_menu" name="Purchase Indent" parent="ipm_indent" sequence="2"/>
+				
+				<!-- Service Transaction Menu -->
+				<menuitem id="ipm_service_indent_menu" name="Service Entry" parent="ipm_indent" sequence="3"/>
+				
+				<!-- Service Indent -->
+				<menuitem action="kg_service_indent.action_kg_serviceindent_form" id="iam_service_indent" name="Service Indent" parent="ipm_service_indent_menu" sequence="1"/>
+			
+			
+		<!-- Purchase Menu -->
+			<!-- Purchase Master Menu -->
+				<menuitem id="ppm_master_menu" name="Masters" parent="base.menu_purchase_root" sequence="0"/>
+				
+				<!-- Quotations Menu -->
+				<menuitem id="qpm_quotations_menu" name="Quotations" parent="base.menu_purchase_root" sequence="1"/>
+				
+                <!-- Service Order Menu -->
+				<menuitem id="spm_service_order_menu" name="Service" parent="base.menu_purchase_root" sequence="2"/>
+				
+				<!-- SO Amendment Order -->
+				<menuitem action="kg_so_amendment.so_amendment_sample_form_action1" id="sam_so_amendment" name="Service Amendment" parent="spm_service_order_menu" sequence="2"/>
+				
+				<!-- Advance Menu -->
+				<menuitem id="apm_advance_menu" name="Advance" parent="base.menu_purchase_root" sequence="3"/>
+				
+			    <!-- Service Invoice Menu -->
+				<menuitem id="spm_service_invoice_menu" name="Bills" parent="base.menu_purchase_root" sequence="4"/>
+				   
+				<!-- Service Invoice Transaction -->
+				<menuitem action="kg_service_invoice.action_kg_serviceinv_form" id="aam_service_invoice" name="Service Bill" parent="spm_service_invoice_menu" sequence="2"/>
+		 
+		  <!-- Purchase Report Menu -->
+			<menuitem id="rpm_report_menu" name="Reports" parent="base.menu_purchase_root" sequence="6"/>
+				 
+
+			
+			<menuitem id="rpm_excel_report_menu" name="Excel Reports" parent="base.menu_purchase_root" sequence="7"/>
+				
+				<!-- PO Menu -->
+				<menuitem name="PO Register" parent="rpm_excel_report_menu" action="kg_reports.ram_po_reg_excel_report" id="ram_excel_po_register_reports" sequence="1"/>
+				 	 
+		<!-- Warehouse Menu -->
+		        
+			<!-- Store Masters Menu -->
+			<menuitem name="Store Masters" id="mpm_store_master" parent = "stock.menu_stock_root" sequence="0"/>
+				
+				<!-- Stock Locations Master  --> 
+				<menuitem action="stock.action_location_form" name="Stock Locations" id="mam_inventory_master" parent="mpm_store_master" sequence="5"/>
+				
+		        <!-- GRN -->
+				<menuitem id="gpm_grn_issue_menu" name="GRN" parent="stock.menu_stock_root" sequence="1"/>
+				
+				<!-- Store Issue -->
+				<menuitem name="Store Issue" id="tpm_store_issue" parent="stock.menu_stock_root" sequence="2"/>
+				
+				<!-- Stock Movement -->
+				<menuitem id="mam_stock_movement" name="Stock Movement" parent="stock.menu_stock_root" sequence="3"/>
+				
+
+				
+				<!-- Physical Stock -->
+				<menuitem id="tpm_physical_stock" name="Physical Stock" parent="stock.menu_stock_root" sequence="4"/>
+				
+
+				
+				<!-- Gate Pass -->
+				<menuitem id="gpm_gate_pass_menu" name="Gate Pass" parent="stock.menu_stock_root" sequence="5"/>
+                
+				<!-- Purchase Invoice -->
+				<menuitem id="ppm_purchase_invoice_menu" name="Invoice" parent="stock.menu_stock_root" sequence="6"/>
+                
+				<!-- Inward -->
+				<menuitem id="cpm_contractor_inward_menu" name="Inward" parent="stock.menu_stock_root" sequence="7"/>
+                
+
+				
+				<!-- Manual Closing -->
+				<menuitem id="mpm_manual_closing_menu" name="Manual Closing" parent="stock.menu_stock_root" sequence="7"/>
+                
+ 
+				
+				<!-- Item Ledger -->
+				<menuitem id="ipm_item_ledger_menu" name="Item Ledger" parent="stock.menu_stock_root" sequence="8"/>
+                
+  
+			
+					
+			<!-- Store Reports Menu -->
+            <menuitem name="Reports" id="rpm_str_reports" parent = "stock.menu_stock_root" sequence="8"/>
+            
+				
+				<!-- Closing Stock Menu -->
+				<menuitem name="Closing Stock" parent="rpm_str_reports" action="kg_reports.ram_close_stock_report" id="ram_closing_stock" sequence="11"/>
+				
+				
+		<!-- Parent Report Menu -->
+		<menuitem name="Reports" id="rpm_reports" sequence="94"/> 
+			
+			<!-- Planning Reports Menu -->
+            <menuitem name="Planning Reports" id="rpm_planning_reports" parent = "rpm_reports" sequence="0"/>
+            
+            <!-- Planning Excel Reports Menu -->
+            <menuitem name="Planning Excel Reports" id="rpm_planning_excel_reports" parent = "rpm_reports" sequence="0"/>
+            
+				<!-- Dashboard Menu -->
+				<menuitem name="Dashboard" parent="rpm_planning_reports" action="board.open_board_my_dash_action" id="kg_dash_board" sequence="0"/>
+				
+				
+			
+			<!-- Purchase Reports Menu -->
+            <menuitem name="Purchase" id="rpm_purchase_reports" parent = "rpm_reports" sequence="1"/>
+				
+				<!-- PO Register Report-->
+				<menuitem name="PO Register" parent="rpm_purchase_reports" action="kg_reports.action_po_stm_report" id="ram_po_register_reports" sequence="1"/>
+			
+			<menuitem id="rpm_excel_report_menu" name="Excel Reports" parent="rpm_reports" sequence="2"/>
+				
+				<!-- PO Menu -->
+				
+				<menuitem name="PO Register" parent="rpm_excel_report_menu" action="kg_reports.ram_po_reg_excel_report" id="ram_excel_po_register_reports" sequence="1"/>
+	
+			<!-- Warehouse Reports Menu -->
+            <menuitem name="Warehouse" id="rpm_warehouse_reports" parent = "rpm_reports" sequence="3"/>
+				
+				<!-- Issue Register Report-->
+				<menuitem name="Issue Register" parent="rpm_warehouse_reports" action="kg_reports.action_dep_issue_register11" id="ram_issue_register_reports" sequence="2"/>
+			<!-- Warehouse Reports Menu -->
+            <menuitem name="CRM" id="rpm_crm_reports" parent = "rpm_reports" sequence="4"/>
+		
+		<!-- Scheduler Menu -->
+		<menuitem id="spm_scheduler" name="Scheduler" sequence="2" />
+		
+			<!-- Scheduler sub Menu -->
+			<menuitem id="spm_mail_menu" name="Mail Settings" parent="spm_scheduler" sequence="1" />				
+			
+			<!--MGMT menus-->
+			
+			<menuitem name="MGMT" id="menu_mgmt" sequence="92"/>
+				<menuitem name="Purchase" id="menu_mgmt_masters"  parent="menu_mgmt"  sequence="0"/>
+				
+					<menuitem action="purchase.purchase_rfq_spl_approval" id="mgmt_pam_purchase_order_spl_approvals" name="Special Approval PO" parent="menu_mgmt_masters" sequence="0"/>
+					<menuitem action="purchase.tma_wfamd_po" id="mgmt_tam_wfamd_po" name="WFAMD PO" parent="menu_mgmt_masters" sequence="1"/>
+				
+				<menuitem name="Warehouse" id="menu_mgmt_masters_ware"  parent="menu_mgmt"  sequence="1"/>
+				
+					<menuitem name="GRN" id="menu_mgmt_masters_ware_grn"  parent="menu_mgmt"  sequence="0"/>
+						
+						<menuitem action="kg_general_grn.tma_fou_grn" id="mgmt_tam_fou_grn" name="GRN - Foundry" parent="menu_mgmt_masters_ware_grn" sequence="0"/>
+						<menuitem action="kg_general_grn.tma_ms_grn" id="mgmt_tam_ms_grn" name="GRN - MS" parent="menu_mgmt_masters_ware_grn" sequence="1"/>
+						<menuitem action="kg_general_grn.action_kg_general_grn" id="mgmt_gam_general_grn" name="GRN - IPD" parent="menu_mgmt_masters_ware_grn" sequence="2"/>						
+						<menuitem action="kg_po_grn.tma_fou_po_grn" id="tam_fou_po_grn_mgmt" name="PO/SO GRN - Foundry" parent="menu_mgmt_masters_ware_grn" sequence="3"/>
+						<menuitem action="kg_po_grn.tma_ms_po_grn" id="tam_ms_po_grn_mgmt" name="PO/SO GRN - MS" parent="menu_mgmt_masters_ware_grn" sequence="4"/>
+						<menuitem action="kg_po_grn.tma_po_grn" id="gam_po_grn_mgmt" name="PO/SO GRN - IPD" parent="menu_mgmt_masters_ware_grn" sequence="5"/>
+						
+
+					<menuitem name="Stock View" id="menu_mgmt_masters_ware_stock_view"  parent="menu_mgmt"  sequence="1"/>
+					
+						<menuitem action="stock.action_production_lot_form" id="menu_action_production_lot_form_mgmt" parent="menu_mgmt_masters_ware_stock_view" sequence="0"/> 
+						<menuitem action="kg_grn.tma_ms_stock_list" id="tam_ms_stock_list_mgmt" parent="menu_mgmt_masters_ware_stock_view" sequence="2"/>
+						<menuitem action="kg_grn.tma_fou_stock_list" id="tam_fou_stock_list_mgmt" parent="menu_mgmt_masters_ware_stock_view" sequence="3"/>
+						
+					<menuitem name="Reports" id="menu_mgmt_masters_ware_rpt"  parent="menu_mgmt"  sequence="1"/>
+					
+						<menuitem name="Closing Stock" parent="menu_mgmt_masters_ware_rpt" action="kg_reports.ram_close_stock_report" id="wma_closing_stock_mgmt_rpt" sequence='0'/>
+						<menuitem name="PO Register" parent="menu_mgmt_masters_ware_rpt" action="kg_reports.action_po_stm_report" id="ram_po_register_reports_mgmt" sequence="1"/>
+						
+				<menuitem name="Transactions" id="menu_mgmt_masters_ppc_trans"  parent="menu_mgmt"  sequence="2"/>	
+				
+					<menuitem  action="kg_work_order.tma_work_order" name="Work order Design" id="tam_work_order_ppc_mgmt" parent="menu_mgmt_masters_ppc_trans" sequence="0"/>
+					<menuitem  action="kg_work_order.tma_work_md_order_mgmt" id="tam_wo_md_approval_mgmts" parent="menu_mgmt_masters_ppc_trans" sequence="1"/>
+					<menuitem  action="kg_work_order.tma_work_order_app" id="tam_wo_approval_mgmt" parent="menu_mgmt_masters_ppc_trans" sequence="2"/>
+					<menuitem  action="kg_work_order.tma_unscheduled_wo_list" id="tam_unscheduled_work_order_ppc_mgmt" parent="menu_mgmt_masters_ppc_trans" sequence="3"/>
+					<menuitem action="kg_production.tma_production" id="tam_production_ppc_mgmt" parent="menu_mgmt_masters_ppc_trans" sequence="4"/>
+					<menuitem action="kg_production.tma_pouring_pending" id="tam_pouring_pending_ppc_mgmt" parent="menu_mgmt_masters_ppc_trans" sequence="5"/>
+					<menuitem action="kg_production.tma_pouring_completed" id="tam_pouring_completed_ppc_mgmt" parent="menu_mgmt_masters_ppc_trans" sequence="6"/>
+				
+				<menuitem name="MS Transactions" id="menu_mgmt_masters_ms_trans"  parent="menu_mgmt"  sequence="3"/>	
+				
+					<menuitem action="kg_machineshop.tma_ms_inward" id="tam_ms_inward_ms_mgmt" parent="menu_mgmt_masters_ms_trans" sequence="0" />	
+					
+				<menuitem name="CRM" id="tpm_mgmt_enq_offer" parent="menu_mgmt" sequence="4"/>
+				
+					<menuitem action="kg_crm_enquiry.tma_crm_enquiry" name="Service Enquiry" id="tma_crm_enquiry_service_ms_mgmt" parent="tpm_mgmt_enq_offer" sequence="0"/>					
+					<menuitem action="kg_crm_enquiry.tma_crm_enquiry_marketing" name="Marketing Enquiry" id="tma_crm_enquiry_marketings_ms_mgmt" parent="tpm_mgmt_enq_offer" sequence="1"/>					
+					<menuitem action="kg_crm_offer.tma_crm_offer" name="Offer" id="tam_crm_offer_ms_mgmt" parent="tpm_mgmt_enq_offer" sequence="2"/>					
+					<menuitem  action="kg_work_order.tma_crm_work_order" name="Work order Marketing" id="tam_crm_work_order_ms_mgmt" parent="tpm_mgmt_enq_offer" sequence="3"/>				
+					
+			<!--MGMT menus-->
+		<!--HR menus-->
+			<menuitem name="HR Master" id="menu_hr_master" sequence="91"/>
+				
+			<menuitem  name="General Masters" id="menu_masters_menu" parent="menu_hr_master" sequence="2"/>
+				<menuitem action="hr_payroll.action_salary_rule_form" id="menu_hr_master_ear_ded"  name="Allowance / Deduction" parent="menu_masters_menu" sequence="2"/>
+				<menuitem action="base.action_res_bank_form" id="menu_hr_master_bank" name = "Bank Master" parent="menu_masters_menu" sequence="3" />
+				<menuitem action="hr.action_hr_job" id="menu_hr_jobs" parent="menu_masters_menu" sequence="10"/>
+				<menuitem action="kg_shift_master.mma_shift_master" name="Shift" id="mam_shift_master_1" parent="menu_masters_menu" sequence="17"/>
+				<menuitem parent="menu_masters_menu" id="mam_depmaster_action_1"  action="kg_depmaster.kg_depmaster_action_form" sequence="10" name="Department"/>
+				<menuitem action="kg_employee_category.mma_kg_emp_categ" name="Employee Category" id="mam_kg_emp_categ" parent="menu_masters_menu" sequence="9"/>
+				<menuitem name="Leaves Types" action="hr_holidays.open_view_holiday_status" id="menu_open_view_holiday_status_1" parent="menu_masters_menu" sequence="10"/>
+				<menuitem parent="menu_masters_menu" id="mam_kg_contribution"  action="kg_contribution.mma_kg_contribution" sequence="0" name="Contribution"/>	
+				<menuitem parent="menu_masters_menu" id="mam_kg_job_nature"  action="kg_job_nature.mma_standard_kg_job_nature" sequence="10" name="Nature of Job"/>
+				<menuitem parent="menu_masters_menu" id="mam_kg_division_master_action"  action="kg_division_master.mma_division_master" sequence="10" name="Division"/>
+				
+		<!-- HRMS Reports -->
+			 <menuitem name="HRMS" id="rpm_hrms_reports" parent = "rpm_reports" sequence="1"/>	
+				<!-- CTC Report-->
+				
+				<menuitem name="Worker CTC" parent="rpm_hrms_reports" action="kg_reports.ram_work_ctc_excel_rep" id="ram_worker_ctc_reports"/>
+				<menuitem name="Staff CTC" parent="rpm_hrms_reports" action="kg_reports.ram_staff_ctc_excel_rep" id="ram_staff_ctc_reports"/>
+				<menuitem name="PF" parent="rpm_hrms_reports" action="kg_reports.ram_pf_excel_rep" id="ram_pf_reports" sequence="1"/>
+				<menuitem name="ESI" parent="rpm_hrms_reports" action="kg_reports.ram_esi_excel_rep" id="ram_esi_reports" sequence="2"/>
+				<menuitem name="Permission" parent="rpm_hrms_reports" action="kg_reports.ram_permission_excel_rep" id="ram_permission_reports" sequence="3"/>
+				<menuitem name="ON Duty" parent="rpm_hrms_reports" action="kg_reports.ram_od_excel_rep" id="ram_on_duty_reports" sequence="4"/>
+				<menuitem name="Attendance" parent="rpm_hrms_reports" action="kg_reports.ram_att_excel_rep" id="ram_attendance_reports" sequence="5"/>
+				<menuitem name="Advance" parent="rpm_hrms_reports" action="kg_reports.ram_advance_excel_rep" id="ram_advance_reports" sequence="6"/>
+				<menuitem name="Punching" parent="rpm_hrms_reports" action="kg_reports.ram_punching_excel_rep" id="ram_punching_reports" sequence="7"/>
+				<menuitem name="Gratuity" parent="rpm_hrms_reports" action="kg_reports.ram_gratuity_excel_rep" id="ram_gratuity_reports" sequence="8"/>
+				<menuitem name="OT" parent="rpm_hrms_reports" action="kg_reports.ram_ot_excel_rep" id="ram_ot_reports" sequence="9"/>
+				<menuitem name="Bank Copy" parent="rpm_hrms_reports" action="kg_reports.ram_bank_copy_excel_rep" id="ram_bank_copy_reports" sequence="10"/>
+				
+		
+			<!--Duplicate Account Menus-->
+			<menuitem  name="Views" id="menu_kg_chart_acc" parent = "account.mpm_acc_masters" sequence="4"/>
+				<menuitem action="account.action_account_chart" name="Chart Of Accounts" id="mam_kg_chart_accounts" parent="menu_kg_chart_acc" sequence="0"/>
+		
+		
+    </data>
+</openerp>
