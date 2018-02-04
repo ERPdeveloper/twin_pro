@@ -1906,7 +1906,8 @@ class account_tax(osv.osv):
     _name = 'account.tax'
     _description = 'Tax'
     _columns = {
-        'name': fields.char('Tax Name', size=64, required=True, translate=True, help="This name will be displayed on reports"),
+        'name': fields.char('Name', size=64, required=True, translate=True, help="This name will be displayed on reports"),
+        'code': fields.char('Code', size=64, required=True),
         'sequence': fields.integer('Sequence', required=True, help="The sequence field is used to order the tax lines from the lowest sequences to the higher ones. The order is important if you have a tax with several tax children. In this case, the evaluation order is important."),
         'amount': fields.float('Amount', required=True, digits_compute=get_precision_tax(), help="For taxes of type percentage, enter % ratio between 0-1."),
         'active': fields.boolean('Active', help="If the active field is set to False, it will allow you to hide the tax without removing it."),
@@ -1944,11 +1945,33 @@ class account_tax(osv.osv):
         'company_id': fields.many2one('res.company', 'Company', required=True),
         'description': fields.char('Tax Code'),
         'price_include': fields.boolean('Tax Included in Price', help="Check this if the price you use on the product and invoices includes this tax."),
-        'type_tax_use': fields.selection([('sale','Sale'),('purchase','Purchase'),('all','All')], 'Tax Application', required=True)
+        'type_tax_use': fields.selection([('sale','Sale'),('purchase','Purchase'),('all','All')], 'Tax Application', required=True),
+        'tax_type': fields.selection([('sgst','SGST'),('cgst','CGST'),('igst','IGST')], 'Type', required=True,),
+        
+        ## Newly added by openerp developers ##
+        
+        'state': fields.selection([('draft','Draft'),('validated','Validated'),('rejected','Rejected')],'Status', readonly=True),
+		'notes': fields.text('Notes'),
+		'remark': fields.char('Rejected For'),
+		'source_mode': fields.selection([('auto','Auto'),('manual','Manual')],'Source Mode', readonly=True),
+		
+		# Entry Info
+		
+		'company_id': fields.many2one('res.company', 'Company Name',readonly=True),
+		'active': fields.boolean('Active'),
+		'crt_date': fields.datetime('Created On',readonly=True),
+		'crt_user_id': fields.many2one('res.users', 'Created By', readonly=True),
+		'validated_date': fields.datetime('Validated On', readonly=True),
+		'validated_user_id': fields.many2one('res.users', 'Validated By', readonly=True),
+		'rejected_date': fields.datetime('Rejected On', readonly=True),
+		'rejected_user_id': fields.many2one('res.users', 'Rejected By', readonly=True),
+		'updated_date': fields.datetime('Recent Update On', readonly=True),
+		'updated_user_id': fields.many2one('res.users', 'Recent Update By', readonly=True),
 
     }
     _sql_constraints = [
         ('name_company_uniq', 'unique(name, company_id)', 'Tax Name must be unique per company!'),
+        ('code_uniq', 'unique(code)', 'Tax Code must be unique per company!'),
     ]
 
     def name_search(self, cr, user, name, args=None, operator='ilike', context=None, limit=80):
@@ -2030,7 +2053,12 @@ class account_tax(osv.osv):
         'tax_sign': 1,
         'base_sign': 1,
         'include_base_amount': False,
-        'company_id': _default_company,
+        'company_id': lambda self,cr,uid,c: self.pool.get('res.company')._company_default_get(cr, uid, 'account.tax', context=c),
+        'active': True,
+		'state': 'draft',
+		'crt_user_id': lambda obj, cr, uid, context: uid,
+		'crt_date': lambda * a: time.strftime('%Y-%m-%d %H:%M:%S'),
+		'source_mode': 'manual',
     }
     _order = 'sequence'
 
@@ -2282,6 +2310,40 @@ class account_tax(osv.osv):
                 r['amount'] = round(r['amount'] * quantity, precision)
                 total += r['amount']
         return res
+	
+	def write(self, cr, uid, ids, vals, context=None):
+		vals.update({'updated_date': time.strftime('%Y-%m-%d %H:%M:%S'),'updated_user_id':uid})
+		return super(account_tax, self).write(cr, uid, ids, vals, context)
+    
+    def unlink(self,cr,uid,ids,context=None):
+		unlink_ids = []
+		for rec in self.browse(cr,uid,ids):
+			if rec.state not in ('draft','cancel'):
+				raise osv.except_osv(_('Warning !'),_('Draft only can be deleted.'))
+			else:
+				unlink_ids.append(rec.id)
+		return osv.osv.unlink(self, cr, uid, unlink_ids, context=context)
+    
+    def entry_reject(self,cr,uid,ids,context=None):
+		rec = self.browse(cr,uid,ids[0])
+		if rec.state == 'validated':
+			if rec.remark:
+				self.write(cr, uid, ids, {'state': 'rejected','rejected_user_id': uid, 'rejected_date': time.strftime('%Y-%m-%d %H:%M:%S')})
+			else:
+				raise osv.except_osv(_('Warning !'),_('Enter Reason For rejection.'))
+		return True
+    
+    def entry_validate(self,cr,uid,ids,context=None):
+		rec = self.browse(cr,uid,ids[0])
+		if rec.state == 'draft':
+			self.write(cr, uid, ids, {'state': 'validated','validated_user_id': uid, 'validated_date': time.strftime('%Y-%m-%d %H:%M:%S')})
+		return True
+    
+    def entry_revert(self,cr,uid,ids,context=None):
+		rec = self.browse(cr,uid,ids[0])
+		if rec.state == 'validated':
+			self.write(cr, uid, ids, {'state': 'draft'})
+		return True
 
 account_tax()
 
@@ -2856,7 +2918,7 @@ class account_tax_template(osv.osv):
         'ref_tax_sign': fields.float('Tax Code Sign', help="Usually 1 or -1."),
         'include_base_amount': fields.boolean('Include in Base Amount', help="Set if the amount of tax must be included in the base amount before computing the next taxes."),
         'description': fields.char('Internal Name'),
-        'type_tax_use': fields.selection([('sale','Sale'),('purchase','Purchase'),('all','All')], 'Tax Use In', required=True,),
+        'type_tax_use': fields.selection([('sale','Sale'),('purchase','Purchase'),('all','All')], 'Type', required=True,),
         'price_include': fields.boolean('Tax Included in Price', help="Check this if the price you use on the product and invoices includes this tax."),
     }
 

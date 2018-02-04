@@ -869,11 +869,13 @@
             <field name="model">account.tax</field>
             <field name="field_parent">child_ids</field>
             <field name="arch" type="xml">
-                <tree string="Account Tax">
+                <tree colors="blue:state == 'draft';black:state == 'validated';gray:state == 'rejected'" toolbar="True" string="Tax Master">
                     <field name="name"/>
-                    <field name="price_include"/>
-                    <field name="description"/>
-                    <field name="company_id" widget="selection" groups="base.group_multi_company"/>
+                    <field name="tax_type"/>
+                    <field name="state"/>
+                    <field name="price_include" invisible="1"/>
+                    <field name="description" invisible="1"/>
+                    <field name="company_id" widget="selection" groups="base.group_multi_company" invisible="1"/>
                 </tree>
             </field>
         </record>
@@ -881,9 +883,16 @@
             <field name="name">account.tax.search</field>
             <field name="model">account.tax</field>
             <field name="arch" type="xml">
-                <search string="Search Taxes">
-                    <field name="name" filter_domain="['|', ('name','ilike',self), ('description','ilike',self)]" string="Tax"/>
-                    <field name="company_id" groups="base.group_multi_company"/>
+				<search string="Tax">
+					<field name="name" string="Tax"  filter_domain="['|', ('name','ilike',self), ('code','ilike',self)]" />
+					<filter icon="terp-check" name="draft" string="Draft" domain="[('state','=','draft')]"/>
+					<filter icon="terp-check" name="validated" string="Validated" domain="[('state','=','validated')]"/>
+					<filter icon="terp-check" name="rejected" string="Rejected" domain="[('state','=','rejected')]"/>
+					<separator/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Type" icon="terp-gtk-select-all" domain="[]" context="{'group_by':'tax_type'}"/>
+                        <filter string="State" icon="terp-gtk-select-all" domain="[]" context="{'group_by':'state'}"/>
+					</group>
                 </search>
             </field>
         </record>
@@ -892,26 +901,62 @@
             <field name="model">account.tax</field>
             <field name="arch" type="xml">
                 <form string="Account Tax" version="7.0">
+					<header>
+						<button name="entry_validate" type="object" string="Validate" states="draft" class="oe_highlight" confirm="Are you sure to proceed ?"/>
+						<button name="entry_reject" type="object" string="Reject" states="validated" class="oe_highlight" confirm="Are you sure to proceed ?"/>
+						<button name="entry_revert" type="object" string="Revert" states="validated" class="oe_highlight" confirm="Are you sure to proceed ?"/>
+					</header>
                     <group>
                         <group>
-                            <field name="name"/>
-                            <field name="description"/>
+                            <field name="name" invisible="1"/>
+                            <field name="name"  class='aplhanum_expect' attrs="{'readonly': [('state','not in',['draft'])]}"/>
+                            <field name="type" invisible="1"/>
+                            <field name="tax_type"  attrs="{'readonly': [('state','not in',['draft'])]}" required="1"/>
+							<field name="remark" attrs="{'invisible':[('state','=','draft')], 'readonly': [('state','in',['rejected'])]}"/>
+                            <field name="description" invisible="1"/>
                         </group>
                         <group>
-                            <field name="type_tax_use"/>
-                            <field name="company_id" widget="selection" groups="base.group_multi_company"/>
-                            <field name="active"/>
+							<field name="code" required="1" class='aplhanum_expect' attrs="{'readonly': [('state','not in',['draft'])]}"/>
+							<field name="amount" string="Amount=(Percentage/100)" attrs="{'readonly': [('state','not in',['draft'])]}"/>
+							<field name="state" style="width: 30%%" class="att_state_change"/>
+                            <field name="type_tax_use" invisible="1"/>
                         </group>
                     </group>
                     <notebook>
-                        <page string="Tax Definition">
+						<page string="Log Info">
+							<group>
+								<group>
+									<field name="company_id"/>
+								</group>
+								<group>
+									<field name="active"/>
+								</group>
+								<group>
+									<field name="crt_user_id"/>
+									<field name="validated_user_id" attrs="{'invisible':[('state','in',['draft'])]}"/>
+									<field name="rejected_user_id" attrs="{'invisible':[('state','not in',['rejected'])]}"/>
+									<field name="updated_user_id"/>
+								</group>
+								<group>
+									<field name="crt_date"/>
+									<field name="validated_date" attrs="{'invisible':[('state','in',['draft'])]}"/>
+									<field name="rejected_date" attrs="{'invisible':[('state','not in',['rejected'])]}"/>
+									<field name="updated_date"/>
+									<field name="source_mode"/>
+								</group>
+							</group>
+						</page>
+						<field name="notes" placeholder="Reference Notes" attrs="{'readonly': [('state','in',['rejected'])]}"/>
+                        <page string="Tax Definition" invisible="1">
                         <group>
                             <group string="Tax Computation">
                                 <label for="type"/>
+<!--
                                 <div>
                                     <field name="type"/>
                                     <field name="amount" attrs="{'invisible':[('type','in',('none', 'code', 'balance'))]}"/>
                                 </div>
+-->
                                 <field name="python_compute" attrs="{'invisible':[('type','!=','code')],'required':[('type','=','code')]}"/>
                                 <field name="python_compute_inv" attrs="{'invisible':[('type','!=','code')],'required':[('type','=','code')]}"/>
                                 <field name="price_include"/>
@@ -953,7 +998,7 @@
                             </group>
                         </group>
                         </page>
-                        <page string="Special Computation">
+                        <page string="Special Computation" invisible="1">
                             <group col="4">
                                 <separator colspan="4" string="Applicability Options"/>
                                 <field name="applicable_type"/>
@@ -974,6 +1019,7 @@
             <field name="domain">[('parent_id','=',False)]</field>
         </record>
         <menuitem action="action_tax_form" id="menu_action_tax_form" parent="next_id_27"/>
+        <menuitem action="action_tax_form" name="Taxes" id="mam_m_taxes" parent="parent_menus.mrm_taxes_masters" sequence="1"/>
 
         <record id="action_tax_code_tree" model="ir.actions.act_window">
             <field name="name">Chart of Taxes</field>
