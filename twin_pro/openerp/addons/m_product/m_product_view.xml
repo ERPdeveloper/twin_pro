@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+	
+	<!-- Product Master form view -->
+	
+	<record model="ir.ui.view" id="m_product_form_inherit">
+        <field name="name">m.product.form.inherit</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+		
+		<field name="categ_id" position="after">
+			<field name="hsn_no" required="1"/>
+			<field name="is_accessories" invisible="1"/>
+			<field name="capital" invisible="1"/>
+			<field name="abc" invisible="1"/>
+		</field>
+				
+		<field name="tolerance_applicable" position="after">
+		<field name="is_depreciation" attrs="{'invisible':[('product_type','not in',['capital'])]}"/>
+		</field>
+		<field name="tolerance_plus" position="after">
+		<field name="price_type" required="1" attrs="{'readonly':[('state','=','validated')]}"/>
+		</field>
+		<field name="variants" position="replace">
+		<field name="variants" invisible="1"/>
+		</field>
+		
+		<field name="pro_seller_ids" position="replace">
+		</field>
+		
+		<field name="price_extra" position="replace">
+		<field name="price_extra" invisible="1"/>
+		</field>
+		<field name="price_margin" position="replace">
+		<field name="price_margin" invisible="1"/>
+		</field>
+		<field name="uom_id" position="before">
+		<field name="product_type"/>
+		<field name="uom_conversation_factor" attrs="{'readonly':[('state','=','validated')]}"/>
+		</field>
+		
+		<field name="stock_in_hand" position="after">
+		<field name="length" invisible="1"/>
+		<field name="breadth" invisible="1"/>
+		<field name="od" invisible="1"/>
+		<field name="thickness" invisible="1"/>
+		<field name="weight" invisible="1"/>
+		</field>
+		
+		<field name="uom_po_id" position="after">
+		<field name="po_uom_coeff" attrs="{'readonly':[('state','=','validated')]}"/>
+		<field name="po_uom_in_kgs" attrs="{'required':['|','|',('price_type','=','per_kg'),('uom_code','=','Kg'),('uom_conversation_factor','=','two_dimension')],'readonly':[('state','=','validated')]}"/>
+		<field name="uom_code" invisible="1"/>
+		</field>
+		
+		<field name="list_price" position="replace">
+		</field>
+		
+		<field name="sale_ok" position="replace">
+        <field name="sale_ok" invisible="1"/>
+        </field>
+        
+        <field name="user_id" position="replace">
+			<field name="crt_user_id"/>
+			<field name="validated_user_id" attrs="{'invisible':[('state','in',['draft'])]}"/>
+			<field name="rejected_user_id" attrs="{'invisible':[('state','not in',['rejected'])]}"/>
+		</field>
+        <field name="creation_date" position="replace">
+			<field name="crt_date"/>
+			<field name="validated_date" attrs="{'invisible':[('state','in',['draft'])]}"/>
+			<field name="rejected_date" attrs="{'invisible':[('state','not in',['rejected'])]}"/>
+			<field name="source_mode" invisible="0"/>
+		</field>
+		
+		<xpath expr = "//page[@string='Suppliers']" position="replace">
+			<page string="Suppliers">
+				<group>
+					<group>
+						<field name="pro_seller_ids" nolabel="1"/>
+					</group>
+				</group>
+			</page>
+		</xpath>
+		</field>
+	</record>
+	
+	<record model="ir.ui.view" id="m_product_field_hidden_inherit">
+        <field name="name">m.product.field.hidden.inherit</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_variant_form_view"/>
+        <field name="arch" type="xml">
+			<group>
+		<field name="variants" position="replace">
+		<field name="variants" invisible="1"/>
+		</field>	
+		<field name="price_extra" position="replace">
+		<field name="price_extra" invisible="1"/>
+		</field>
+		<field name="price_margin" position="replace">
+		<field name="price_margin" invisible="1"/>
+		</field>
+		</group>
+		
+		</field>
+	</record>
+	
+	<record model="ir.ui.view" id="m_product_tree">
+		<field name="name">product.product.tree</field>
+		<field name="model">product.product</field>
+		<field name="inherit_id" ref="product.product_product_tree_view"/>
+		<field name="arch" type="xml">
+			<field name="categ_id" position="after"> 
+				<field name="product_type"/> 
+			</field>
+			
+		</field>
+	</record>	
+	
+	<!-- Product Master Purchase --> 
+	<menuitem action="product.product_normal_action" name="Product" id="mam_product_master" parent="parent_menus.mrm_po_inv_masters" sequence="10"/>
+	
+	<!-- Product Category Master -->
+	<menuitem action="product.product_category_action_form" name="Product Category" id="mam_product_catg_master" parent="parent_menus.mrm_po_inv_masters" sequence="11"/>
+	
+	<!-- Units of Measure Master  -->
+	<menuitem action="product.product_uom_form_action" name="Units of Measure" id="mam_uom_master" parent="parent_menus.mrm_po_inv_masters" sequence="12"/>
+	
+	</data>
+</openerp>

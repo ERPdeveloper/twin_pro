@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <menuitem id="prod_config_main" name="Products" parent="base.menu_base_config" sequence="70"/>
+       <!-- <menuitem id="prod_config_main" name="Products" parent="base.menu_base_config" sequence="70"/> -->
 
         <record id="product_search_form_view" model="ir.ui.view">
             <field name="name">product.search.form</field>
@@ -9,7 +9,11 @@
             <field name="arch" type="xml">
                 <search string="Product">
                    <field name="name" string="Product" filter_domain="['|',('name','ilike',self),('default_code','ilike',self)]"/>
-                   <filter string="Services" icon="terp-accessories-archiver" domain="[('type','=','service')]"/>
+                   <filter icon="terp-check" name="draft" string="Draft" domain="[('state','=','draft')]"/>
+				   <filter icon="terp-check" name="confirmed" string="Confirmed" domain="[('state','=','confirm')]"/>
+				   <filter icon="terp-check" name="approve" string="Approved" domain="[('state','=','approved')]"/>
+				   <filter icon="terp-check" name="reject" string="Rejected" domain="[('state','=','reject')]"/>	
+<!--               <filter string="Services" icon="terp-accessories-archiver" domain="[('type','=','service')]"/>
                    <filter string="Consumable" name="consumable" icon="terp-accessories-archiver" domain="[('type','=','consu')]" help="Consumable products"/>
                    <separator/>
                    <filter string="Can be Sold" name="filter_to_sell" icon="terp-accessories-archiver-minus" domain="[('sale_ok','=',1)]"/>
@@ -17,12 +21,14 @@
                    <group expand="0" string="Context...">
                        <field name="pricelist_id" context="{'pricelist': self}" groups="product.group_sale_pricelist"/>
                        <field name="company_id" groups="base.group_multi_company"/>
-                   </group>
+                   </group>-->
                    <group  expand='0' string='Group by...'>
                        <filter string='Category' icon="terp-stock_symbol-selection" domain="[]" context="{'group_by' : 'categ_id'}"/>
                        <filter string='Default Unit of Measure' icon="terp-mrp" domain="[]" context="{'group_by' : 'uom_id'}"/>
-                       <filter string='Type' icon="terp-stock_symbol-selection" domain="[]" context="{'group_by' : 'type'}"/>
-                       <filter string='Company' icon="terp-go-home" domain="[]" context="{'group_by' : 'company_id'}" groups="base.group_multi_company"/>
+                       <filter string='Product Type' icon="terp-stock_symbol-selection" domain="[]" context="{'group_by' : 'product_type'}"/>
+                       <filter string='Status' icon="terp-stock_symbol-selection" domain="[]" context="{'group_by' : 'state'}"/>
+<!--                   <filter string='Company' icon="terp-go-home" domain="[]" context="{'group_by' : 'company_id'}" groups="base.group_multi_company"/>
+-->
                    </group>
                 </search>
             </field>
@@ -33,19 +39,27 @@
             <field name="model">product.product</field>
             <field eval="7" name="priority"/>
             <field name="arch" type="xml">
+<!--
                 <tree colors="red:virtual_available&lt;0;blue:virtual_available&gt;=0 and state in ('draft', 'end', 'obsolete');black:virtual_available&gt;=0 and state not in ('draft', 'end', 'obsolete')" string="Products">
-                    <field name="default_code"/>
+-->					<tree colors="blue:state == 'draft';red:state == 'confirm'
+						;black:state == 'approved';gray:state == 'reject';gray:state == 'cancel'" string="Products">
+                    <field name="default_code" invisible="1"/>
+                    <field name="product_code" invisible="1"/>
                     <field name="name"/>
-                    <field name="categ_id" invisible="1"/>
+                    <field name="categ_id"/>
                     <field name="type" invisible="1"/>
-                    <field name="variants" groups="product.group_product_variant"/>
-                    <field name="uom_id" string="Unit of Measure" groups="product.group_uom"/>
-                    <field name="qty_available"/>
-                    <field name="virtual_available"/>
-                    <field name="lst_price"/>
-                    <field name="price" invisible="not context.get('pricelist',False)"/>
+                    <field name="variants" groups="product.group_product_variant" invisible="1"/>
+                    <field name="uom_id" string="Store UOM" groups="product.group_uom"/>
+                    <field name="uom_po_id" string="PO UOM"/>
+                    <field name="qty_available" invisible="1"/>
+                    <field name="sales_price" invisible="1"/>
+                    <field name="latest_price" readonly="1" invisible="1"/>   
+                    <field name="state"/>                
+                    <field name="virtual_available" invisible="1"/>
+                    <field name="lst_price" invisible="1"/>
+                    <field name="price" invisible="1"/>
                     <field name="standard_price" invisible="1"/>
-                    <field name="state"/>
+                    <field name="rate_type" invisible="1"/>
                     <field name="company_id" groups="base.group_multi_company" invisible="1"/>
                 </tree>
             </field>
@@ -57,118 +71,170 @@
             <field eval="7" name="priority"/>
             <field name="arch" type="xml">
                 <form string="Product" version="7.0">
-                    <sheet>
-                        <field name="image_medium" widget="image" class="oe_avatar oe_left"/>
-                        <div class="oe_title">
-                            <div class="oe_edit_only">
-                                <label for="name" string="Product Name"/>
-                            </div>
-                            <h1>
-                                <field name="name"/>
-                            </h1>
-                            <label for="categ_id" class="oe_edit_only"/>
-                            <h2><field name="categ_id"/></h2>
-                            <div name="options" groups="base.group_user">
-                                <field name="sale_ok"/>
-                                <label for="sale_ok"/>
-                            </div>
-                        </div>
-                        <div class="oe_right oe_button_box" name="buttons">
-                        </div>
-                        <notebook>
-                            <page string="Information">
-                                <group>
-                                    <group>
-                                        <field name="type"/>
-                                        <field name="uom_id" on_change="onchange_uom(uom_id,uom_po_id)" groups="product.group_uom"/>
-                                        <field name="list_price"/>
-                                    </group>
-                                    <group>
-                                        <field name="default_code"/>
-                                        <label for="ean13"/>
-                                        <div name="ean">
-                                            <field name="ean13" placeholder="e.g. 5901234123457"/>
-                                        </div>
-                                    </group>
-                                    <group>
-                                        <field groups="product.group_product_variant" name="variants"/>
-                                        <field name="price_margin" groups="product.group_product_variant"/>
-                                        <field name="price_extra" groups="product.group_product_variant"/>
-                                    </group>
-                                </group>
-                                <field name="description" placeholder="describe the product characteristics..."/>
-                            </page>
-                            <page string="Procurements" groups="base.group_user">
-                                <group name="procurement">
-                                    <group name="general">
-                                        <field name="cost_method" groups="product.group_costing_method"/>
-                                        <field name="standard_price" attrs="{'readonly':[('cost_method','=','average')]}"/>
-                                    </group>
-                                    <group name="procurement_uom" groups="product.group_uom" string="Purchase">
-                                        <field name="uom_po_id"/>
-                                    </group>
-                                </group>
-                                <separator string="Description for Suppliers"/>
-                                <field name="description_purchase" placeholder="This note will be displayed on requests for quotation..."/>
-                            </page>
-                            <page string="Inventory" groups="base.group_user">
-                                <group name="inventory">
-                                    <group name="status" string="Status">
-                                        <field name="state"/>
-                                        <field name="product_manager"/>
-                                    </group>
-                                    <group name="Weights" groups="product.group_stock_packaging" string="Weights">
-                                        <field digits="(14, 3)" name="volume" attrs="{'readonly':[('type','=','service')]}"/>
-                                        <field name="weight" attrs="{'readonly':[('type','=','service')]}"/>
-                                        <field name="weight_net" attrs="{'readonly':[('type','=','service')]}"/>
-                                    </group>
-                                </group>
-                            </page>
-                            <page string="Sales" attrs="{'invisible':[('sale_ok','=',False)]}">
-                                <group name="sale">
-                                    <group string="Sale Conditions">
-                                        <label for="warranty"/>
-                                        <div>
-                                            <field name="warranty" class="oe_inline"/> months
-                                        </div>
-                                    </group>
-                                    <group groups="product.group_uos" string="Unit of Measure">
-                                        <field name="uos_id"/>
-                                        <field name="uos_coeff"/>
-                                        <field name="mes_type"/>
-                                    </group>
-                                </group>
-                                <field name="packaging" groups="product.group_stock_packaging">
-                                    <form string="Packaging" version="7.0">
-                                        <group col="4">
-                                            <field name="ean"/>
-                                            <field name="sequence" invisible="1"/>
-                                            <newline/>
-                                            <field name="qty"/>
-                                            <field name="ul"/>
-                                            <field name="weight_ul"/>
-                                            <separator colspan="4" string="Palletization"/>
-                                            <field name="ul_qty"/>
-                                            <field name="rows"/>
-                                            <field name="weight"/>
-                                            <separator colspan="4" string="Pallet Dimension"/>
-                                            <field name="height"/>
-                                            <field name="width"/>
-                                            <field name="length"/>
-                                        </group>
-                                        <separator colspan="4" string="Description"/>
-                                        <field name="name"/>
-                                    </form>
-                                </field>
-                                <separator string="Description for Quotations"/>
-                                <field name="description_sale" placeholder="note to be displayed on quotations..."/>
-                            </page>
-                        </notebook>
-                    </sheet>
+				 <header> 
+					<button name="entry_validate" type="object" states="draft" string="Validate"  class="oe_highlight" confirm="Are you sure to proceed ?" />
+					<button name="entry_reject" type="object" string="Reject" states="validated" class="oe_highlight" confirm="Are you sure to proceed ?" />
+					<button name="entry_revert" type="object" states="validated" string="Revert" class="oe_highlight" confirm="Are you sure to proceed ?"/>
+				</header>
+					<group>
+						<group>
+							<field name="name" placeholder="Name" attrs="{'readonly':[('state','in',('validated','reject'))]}"/>
+							<field name="categ_id" attrs="{'readonly':[('state','in',('validated','reject'))]}"/>
+						</group>
+						<group>
+							<field name="product_code" placeholder="Code" attrs="{'readonly':[('state','in',('validated','reject'))]}" required="0" invisible="1"/>
+							<field name="prod_code"/>	
+							<field name="state" readonly="1" style="width: 30%%" class="att_state_change"/>	
+							<field name="expiry" invisible ="1"/>
+							<field name="qa_status" invisible ="1"/>
+							<field name="reorder_status" invisible ="1"/>
+							<field name="sale_ok" invisible ="1"/>
+							<field name="rate_type" invisible ="1"/>
+						</group>
+					</group>
+					<notebook>
+						<page string="Information">
+							<group string="Validations">
+								<group>
+									<field name="flag_minqty_rule" attrs="{'readonly':[('state','in',('validated','reject'))]}"/>
+									<field name="flag_expiry_alert" attrs="{'readonly':[('state','in',('validated','reject'))]}"/>
+								</group>
+								<group>
+									<field name="tolerance_applicable" attrs="{'readonly':[('state','in',('validated','reject'))]}"/>
+									<field name="flag_qc_notreq" invisible="1" attrs="{'readonly':[('state','in',('validated','reject'))]}"/>
+								</group>
+							</group>
+							<group>
+								<group>
+									<field name="type" attrs="{'readonly':[('state','in',('validated','reject'))]}" invisible="1"/>
+									<field name="uom_id" on_change="onchange_uom(uom_id,uom_po_id)" groups="product.group_uom" attrs="{'readonly':[('state','=','validated')]}"/>
+									<field name="uom_po_id" on_change="onchange_po_uom(uom_id,uom_po_id)" groups="product.group_uom" attrs="{'readonly':[('state','=','validated')]}"/>
+									<field name="list_price" attrs="{'readonly':[('state','in',('validated','reject'))]}"/>
+									<field name="qty_available" attrs="{'readonly':[('state','in',('validated','reject'))]}" invisible="1"/>                                        
+								</group>
+								<group>
+									<field name="latest_price" readonly="1" invisible="1"/>
+									<field name="design_rate" attrs="{'readonly':[('state','in',('validated','reject'))],'invisible':[('product_type','in',('consu','capital','service'))]}"/>
+									<field name="minimum_qty" attrs="{'readonly':[('state','in',('validated','reject'))],'required':[('flag_minqty_rule','=',True)]}"/>
+									<field name="reorder_qty" attrs="{'readonly':[('state','in',('validated','reject'))],'required':[('flag_minqty_rule','=',True)]}"/>
+									<field name="tolerance_plus" attrs="{'readonly':[('state','in',('validated','reject'))],'required':[('tolerance_applicable','=',True)]}" />                                        
+									<field name="stock_in_hand" invisible="1" attrs="{'readonly':[('state','in',('validated','reject'))]}"/>
+									<field name="default_code" attrs="{'readonly':[('state','in',('validated','reject'))]}" invisible ="1"/>
+									<label for="ean13" invisible ="1"/>
+									<div name="ean" invisible ="1">
+										<field name="ean13" placeholder="e.g. 5901234123457" attrs="{'readonly':[('state','in',('validated','reject'))]}" invisible ="1"/>
+									</div>
+								</group>
+								<group>
+									<field groups="product.group_product_variant" name="variants"/>
+									<field name="price_margin" groups="product.group_product_variant"/>
+									<field name="price_extra" groups="product.group_product_variant"/>
+								</group>
+							</group>
+							 <label for = "description"></label>
+							<field name="description" placeholder="Notes..."/>
+						</page>
+					   
+						<page string="Suppliers"  attrs="{'readonly':[('state','in',('validated','reject'))]}">
+							<group>
+								<group>
+									<field name="pro_seller_ids" nolabel="1"/>
+								</group>
+							</group>
+						</page>
+						
+						<page string="Entry Info">
+							<group>
+								<group>
+									<field name="company_id"/>
+								</group>
+								<group>
+									<field name="active"/>
+								</group>
+								<group>
+									<field name="user_id"/>
+									<field name="update_user_id"/>	
+								</group>
+								<group>
+									<field name="creation_date"/>
+									<field name="update_date"/>						
+								</group>
+							</group>
+						</page>
+						<page string="Procurements" groups="base.group_user" invisible="1">
+							<group name="procurement">
+								<group name="general">
+									<field name="cost_method" groups="product.group_costing_method"/>
+									<field name="standard_price" attrs="{'readonly':[('cost_method','=','average')]}"/>
+								</group>
+								<group name="procurement_uom" groups="product.group_uom" string="Purchase">
+									<!--<field name="uom_po_id"/>-->
+								</group>
+							</group>
+							<separator string="Description for Suppliers"/>
+							<field name="description_purchase" placeholder="This note will be displayed on requests for quotation..."/>
+						</page>
+						<page string="Inventory" groups="base.group_user" invisible="1">
+							<group name="inventory">
+								<group name="status" string="Status">
+<!--
+									<field name="state"/>
+-->
+									<field name="product_manager"/>
+								</group>
+								<group name="Weights" groups="product.group_stock_packaging" string="Weights">
+									<field digits="(14, 3)" name="volume" attrs="{'readonly':[('type','=','service')]}"/>
+									<field name="weight" attrs="{'readonly':[('type','=','service')]}"/>
+									<field name="weight_net" attrs="{'readonly':[('type','=','service')]}"/>
+								</group>
+							</group>
+						</page>
+						<page string="Sales" attrs="{'invisible':[('sale_ok','=',False)]}">
+							<group name="sale">
+								<group string="Sale Conditions">
+									<label for="warranty"/>
+									<div>
+										<field name="warranty" class="oe_inline"/> months
+									</div>
+								</group>
+								<group groups="product.group_uos" string="Unit of Measure">
+									<field name="uos_id"/>
+									<field name="uos_coeff"/>
+									<field name="mes_type"/>
+								</group>
+							</group>
+							<field name="packaging" groups="product.group_stock_packaging">
+								<form string="Packaging" version="7.0">
+									<group col="4">
+										<field name="ean"/>
+										<field name="sequence" invisible="1"/>
+										<newline/>
+										<field name="qty"/>
+										<field name="ul"/>
+										<field name="weight_ul"/>
+										<separator colspan="4" string="Palletization"/>
+										<field name="ul_qty"/>
+										<field name="rows"/>
+										<field name="weight"/>
+										<separator colspan="4" string="Pallet Dimension"/>
+										<field name="height"/>
+										<field name="width"/>
+										<field name="length"/>
+									</group>
+									<separator colspan="4" string="Description"/>
+									<field name="name"/>
+								</form>
+							</field>
+							<separator string="Description for Quotations"/>
+							<field name="description_sale" placeholder="note to be displayed on quotations..."/>
+						</page>
+					</notebook>
+<!--
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers"/>
                         <field name="message_ids" widget="mail_thread"/>
                     </div>
+-->
                 </form>
             </field>
         </record>
@@ -211,7 +277,9 @@
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">product.product</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form,kanban</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'default_product_type': 'consu','default_rate_type': 'purchase_item',}</field>
+			<field name="domain">[('product_type','in',('raw','consu','capital','service')),]</field>
             <field name="view_id" ref="product_product_tree_view"/>
             <field name="search_view_id" ref="product_search_form_view"/>
             <field name="help" type="html">
@@ -268,8 +336,8 @@
             <field name="act_window_id" ref="product_normal_action_sell"/>
         </record>
 
-        <menuitem id="base.menu_product" name="Products" parent="base.menu_base_partner" sequence="9"/>
-        <menuitem action="product.product_normal_action_sell" id="product.menu_products" parent="base.menu_product" sequence="1"/>
+      <!--  <menuitem id="base.menu_product" name="Products" parent="base.menu_base_partner" sequence="9"/>
+        <menuitem action="product.product_normal_action_sell" id="product.menu_products" parent="base.menu_product" sequence="1"/> -->
 
         <record id="product_normal_action_puchased" model="ir.actions.act_window">
             <field name="name">Products</field>
@@ -300,40 +368,123 @@
             <field name="model">product.category</field>
             <field name="arch" type="xml">
                 <search string="Product Categories">
-                    <field name="name" string="Product Categories"/>
-                    <field name="parent_id"/>
+					<field name="name" string="Name" filter_domain="[('name','ilike',self)]"/>
+					<filter icon="terp-check" name="draft" string="Draft" domain="[('state','=','draft')]"/>
+					<filter icon="terp-check" name="confirmed" string="Confirmed" domain="[('state','=','confirm')]"/>
+					<filter icon="terp-check" name="approve" string="Approved" domain="[('state','=','approved')]"/>
+					<filter icon="terp-check" name="reject" string="Rejected" domain="[('state','=','reject')]"/>	
+
+                   <group  expand='0' string='Group by...'>
+                       <filter string='Status' icon="terp-stock_symbol-selection" domain="[]" context="{'group_by' : 'state'}"/>
+                   </group>
                 </search>
             </field>
         </record>
+        
         <record id="product_category_form_view" model="ir.ui.view">
             <field name="name">product.category.form</field>
             <field name="model">product.category</field>
             <field name="arch" type="xml">
                 <form string="Product Categories" version="7.0">
-                    <sheet>
-                        <div class="oe_title">
-                            <label for="name" class="oe_edit_only"/>
-                            <h1>
-                                <field name="name"/>
-                            </h1>
-                        </div>
-                        <group>
-                            <group name="parent" col="4">
-                                <field name="parent_id"/>
-                                <field name="type"/>
-                            </group>
-                        </group>
-                    </sheet>
+					<header>
+						<!--<button name="entry_reject" type="object" string="Reject" states="confirm" class="oe_highlight" confirm="Are you sure to proceed ?"/>-->
+						<button name="entry_confirm" states="draft" string="Confirm" type="object" class="oe_highlight"/>
+						<button name="entry_reject" type="object" string="Reject" states="confirm" class="oe_highlight" confirm="Are you sure to proceed ?" />
+						<button name="entry_approve" states="confirm" string="Approve" type="object" class="oe_highlight" confirm="Are you sure to proceed ?"/>
+						<button name="entry_cancel" type="object" states="approved,reject" string="Cancel" class="oe_highlight" confirm="Are you sure to proceed ?" invisible="1"/>
+						<button name="entry_draft" type="object" states="approved" string="Set To Draft" class="oe_highlight"/>
+					</header>
+					<group>
+						<group>
+							<field name="name" placeholder="Name" attrs="{'readonly': [('state','=','approved')]}" />
+							<field name="parent_id" attrs="{'readonly': [('state','=','approved')],'invisible': [('flag_isparent','=',True)]}"/>							
+						</group>
+						<group>
+							<field name="flag_isparent" attrs="{'readonly': [('state','=','approved')]}" />
+							<field name="state" style="width: 30%%" class="att_state_change"/>
+						</group>
+						<group>
+							<field name="notes"  attrs="{'readonly': [('state','in',['approved','reject','cancel'])]}"/>
+						</group>
+					</group> 
+					<group string='Remarks' attrs="{'invisible':[('state','=','draft')]}">
+						<group>	
+							<field name="remark" attrs="{'invisible':[('state','in',['draft','approved','cancel'])],'readonly': [('state','=','approved')]}"/>
+						</group>
+						<group>												
+							<field name="cancel_remark" invisible="1"/>												
+						</group>
+					</group>
+					<group>
+						<group name="parent" col="4">
+							<field name="type" attrs="{'readonly': [('state','=','approved')]}" invisible="1"/>
+						</group>
+					</group>
+					<notebook>
+						<page string="Entry Info">
+							<group>
+								<group>
+									<field name="company_id"/>
+								</group>
+								<group>
+									<field name="active"/>
+								</group>
+								<group>
+									<field name="user_id"/>
+									<field name="conf_user_id" attrs="{'invisible':[('state','in',['draft'])]}"/>
+									<field name="app_user_id" attrs="{'invisible':[('state','in',['draft','reject','confirm'])]}"/>
+									<field name="cancel_user_id" attrs="{'invisible':[('state','in',['draft', 'confirm','reject','approved'])]}"/>
+									<field name="rej_user_id" attrs="{'invisible':[('state','in',['draft', 'confirm','approved','cancel'])]}"/>
+									<field name="update_user_id"/>
+								</group>
+								<group>
+									<field name="creation_date"/>
+									<field name="confirm_date" attrs="{'invisible':[('state','in',['draft'])]}"/>
+									<field name="approve_date" attrs="{'invisible':[('state','in',['draft','reject','confirm'])]}"/>
+									<field name="cancel_date" attrs="{'invisible':[('state','in',['draft', 'confirm','reject','approved'])]}"/>
+									<field name="reject_date" attrs="{'invisible':[('state','in',['draft', 'confirm','approved','cancel'])]}"/>
+									<field name="update_date"/>
+								</group>
+							</group>
+						</page>
+					</notebook>
                 </form>
             </field>
         </record>
+        
+<!--
+        <record id="product_category_search_form_view" model="ir.ui.view">
+            <field name="name">product.category.form</field>
+            <field name="model">product.category</field>
+            <field name="arch" type="xml">
+                <search string="Product Category">
+                   <field name="name" string="Product" filter_domain="['|',('name','ilike',self),('default_code','ilike',self)]"/>
+                   <filter icon="terp-check" name="draft" string="Draft" domain="[('state','=','draft')]"/>
+				   <filter icon="terp-check" name="confirmed" string="Confirmed" domain="[('state','=','confirm')]"/>
+				   <filter icon="terp-check" name="approve" string="Approved" domain="[('state','=','approved')]"/>
+				   <filter icon="terp-check" name="reject" string="Rejected" domain="[('state','=','reject')]"/>	
+
+                   <group  expand='0' string='Group by...'>
+                       <filter string='Status' icon="terp-stock_symbol-selection" domain="[]" context="{'group_by' : 'state'}"/>
+                   </group>
+                </search>
+            </field>
+        </record>
+-->
+        
         <record id="product_category_list_view" model="ir.ui.view">
             <field name="name">product.category.list</field>
             <field name="model">product.category</field>
             <field name="priority">1</field>
             <field name="arch" type="xml">
+<!--
                 <tree string="Product Categories">
+-->
+				<tree colors="blue:state == 'draft';red:state == 'confirm'
+						;black:state == 'approved';gray:state == 'reject';gray:state == 'cancel'" string="Product Categories">
+					<field name="category_code" invisible="1"/>
                     <field name="complete_name"/>
+                    <field name="state"/>
                 </tree>
             </field>
         </record>
@@ -354,6 +505,7 @@
             <field name="domain">[('parent_id','=',False)]</field>
             <field name="view_type">tree</field>
             <field name="view_id" ref="product_category_tree_view"/>
+            <field name="search_view_id" ref="product_category_search_view"/>
             <field name="help" type="html">
               <p>
                 Here is a list of all your products classified by category. You
@@ -362,11 +514,11 @@
               </p>
             </field>
         </record>
-        <menuitem
+       <!-- <menuitem
             action="product_category_action"
             id="product.menu_products_category"
             parent="base.menu_product"
-            sequence="0" groups="base.group_no_one"/>
+            sequence="0" groups="base.group_no_one"/> -->
         <record id="product_category_action_form" model="ir.actions.act_window">
             <field name="name">Product Categories</field>
             <field name="type">ir.actions.act_window</field>
@@ -375,10 +527,10 @@
             <field name="search_view_id" ref="product_category_search_view"/>
             <field name="view_id" ref="product_category_list_view"/>
         </record>
-        <menuitem action="product_category_action_form"
+      <!--  <menuitem action="product_category_action_form"
             groups="base.group_no_one"
             id="menu_product_category_action_form"
-            parent="prod_config_main" sequence="2"/>
+            parent="prod_config_main" sequence="2"/>-->
 
 
         <record id="product_normal_action_tree" model="ir.actions.act_window">
@@ -396,16 +548,17 @@
             <field eval="'ir.actions.act_window,%d'%product_normal_action_tree" name="value"/>
         </record>
 
-
         <!-- Unit of Measure -->
 
         <record id="product_uom_tree_view" model="ir.ui.view">
             <field name="name">product.uom.tree</field>
             <field name="model">product.uom</field>
             <field name="arch" type="xml">
-                <tree string="Units of Measure">
+				<tree colors="blue:dummy_state == 'draft';red:dummy_state == 'confirm'
+						;black:dummy_state == 'approved';gray:dummy_state == 'reject';gray:dummy_state == 'cancel'" string="Units of Measure">
                     <field name="name"/>
-                    <field name="category_id"/>
+                    <field name="category_id" invisible='1'/>
+                    <field name="dummy_state"/>
                 </tree>
             </field>
         </record>
@@ -415,14 +568,27 @@
             <field name="model">product.uom</field>
             <field name="arch" type="xml">
                 <form string="Units of Measure" version="7.0">
+					<header>
+						<button name="entry_reject" type="object" string="Reject" class="oe_highlight" confirm="Are you sure to proceed ?" attrs="{'invisible':[('dummy_state','!=','confirm')]}" />
+						<button name="entry_confirm" string="Confirm" type="object" class="oe_highlight" attrs="{'invisible':[('dummy_state','!=','draft')]}"/>
+						<button name="entry_approve" string="Approve" type="object" class="oe_highlight" confirm="Are you sure to proceed ?" attrs="{'invisible':[('dummy_state','!=','confirm')]}" />
+						<button name="entry_cancel" type="object" string="Cancel" attrs="{'invisible':[('modify','=','yes')]}" class="oe_highlight" confirm="Are you sure to proceed ?" invisible="1"/>
+<!--					<button name="entry_cancel" type="object" attrs="{'invisible':[('dummy_state','!=','cancel')]}" string="Cancel" class="oe_highlight" confirm="Are you sure to proceed ?" invisible="1"/>-->
+						<button name="entry_draft" type="object"  attrs="{'invisible':['|',('entry_mode','=','auto'),('dummy_state','!=','approved')]}" string="Set To Draft" class="oe_highlight" confirm="Are you sure to proceed ?"/>
+					</header>
                     <group>
                         <group>
-                            <field name="name"/>
-                            <field name="category_id"/>
-                            <field name="uom_type" on_change="onchange_type(uom_type)"/>
-                            <label for="factor"/>
-                            <div>
-                                <field name="factor" attrs="{'invisible':[('uom_type','!=','smaller')]}"/>
+                            <field name="name" attrs="{'readonly':[('dummy_state','=','approved')]}"/>
+                            <field name="uom_category" attrs="{'readonly':[('dummy_state','=','approved')]}"/>
+                            <field name="category_id" invisible="1"/>
+                            <field name="modify" invisible="1"/>
+                            <field name="rounding" invisible="1"/>
+                            
+<!--                        <label for="factor"/>
+                            <div>-->
+<!--                            <field name="factor" attrs="{'invisible':[('uom_type','!=','smaller')]}" />-->
+<!--
+								<field name="factor" invisible="1"/>
                                 <field name="factor_inv" attrs="{'invisible':[('uom_type','!=','bigger')]}"/>
                                 <p attrs="{'invisible':[('uom_type','!=','smaller')]}" class="oe_grey">
                                     e.g: 1 * (reference unit) = ratio * (this unit)
@@ -430,16 +596,74 @@
                                 <p attrs="{'invisible':[('uom_type','!=','bigger')]}" class="oe_grey">
                                     e.g: 1 * (this unit) = ratio * (reference unit)
                                 </p>
-                            </div>
+                            </div>-->
                         </group>
                         <group>
-                            <field name="active"/>
-                            <field name="rounding"/>
+							<field name="uom_type" on_change="onchange_type(uom_type)" readonly="1" invisible='1'/>
+							<field name="dummy_state" style="width: 30%%" class="att_state_change"/>
                         </group>
-                    </group>
+                        <group>
+							<field name="notes" attrs ="{'readonly': [('dummy_state','in',['approved','reject','cancel'])]}"/>
+                        </group>
+                   </group>                       
+                        <group string='Remarks' attrs="{'invisible':[('dummy_state','=','draft')]}">
+							<group>	
+								<field name="remark" attrs="{'invisible':[('dummy_state','not in',('confirm','reject'))], 'readonly': [('dummy_state','in',['approved','reject','cancel'])]}"/>
+							</group>
+							<group>												
+								<field name="cancel_remark" attrs="{'invisible':[('dummy_state','not in',['approved','cancel'])], 'readonly': [('dummy_state','in',['cancel'])]}"/>												
+							</group>
+						</group>
+                        <notebook>
+							<page string="Entry Info">
+								<group>
+									<group>
+										<field name="company_id"/>
+									</group>
+									<group>
+										<field name="active"/>
+									</group>
+									<group>
+										<field name="user_id"/>
+										<field name="confirm_user_id" attrs="{'invisible':[('dummy_state','in',['draft'])]}"/>
+										<field name="cancel_user_id" attrs="{'invisible':[('dummy_state','in',['draft', 'confirm','reject','approved'])]}"/>
+										<field name="ap_rej_user_id" attrs="{'invisible':[('dummy_state','in',['draft', 'confirm'])]}"/>										
+										<field name="update_user_id"/>
+									</group>
+									<group>
+										<field name="crt_date"/>
+										<field name="confirm_date" attrs="{'invisible':[('dummy_state','in',['draft'])]}"/>
+										<field name="cancel_date" attrs="{'invisible':[('dummy_state','in',['draft', 'confirm','reject','approved'])]}"/>
+										<field name="ap_rej_date" attrs="{'invisible':[('dummy_state','in',['draft', 'confirm'])]}"/>										
+										<field name="update_date"/>
+										<field name="entry_mode"/>
+									</group>
+								</group>
+							</page>
+						</notebook>		
+                    
                 </form>
             </field>
         </record>
+        
+        <record id="uom_search_form_view" model="ir.ui.view">
+            <field name="name">UOM</field>
+            <field name="model">product.uom</field>
+            <field name="arch" type="xml">
+                <search string="UOM">
+                   <field name="name" string="Name" filter_domain="[('name','ilike',self)]"/>
+                   <filter icon="terp-check" name="draft" string="Draft" domain="[('dummy_state','=','draft')]"/>
+				   <filter icon="terp-check" name="confirmed" string="Confirmed" domain="[('dummy_state','=','confirm')]"/>
+				   <filter icon="terp-check" name="approve" string="Approved" domain="[('dummy_state','=','approved')]"/>
+				   <filter icon="terp-check" name="reject" string="Rejected" domain="[('dummy_state','=','reject')]"/>	
+               <group  expand='0' string='Group by...'>
+                   <filter string='Status' icon="terp-stock_symbol-selection" domain="[]" context="{'group_by' : 'dummy_state'}"/>
+                   </group>
+                </search>
+            </field>
+        </record>
+        
+        
         <record id="product_uom_form_action" model="ir.actions.act_window">
             <field name="name">Units of Measure</field>
             <field name="type">ir.actions.act_window</field>
@@ -455,9 +679,9 @@
               </p>
             </field>
         </record>
-        <menuitem id="next_id_16" name="Units of Measure" parent="prod_config_main" sequence="30" groups="product.group_uom"/>
+       <!-- <menuitem id="next_id_16" name="Units of Measure" parent="prod_config_main" sequence="30" groups="product.group_uom"/>
         <menuitem action="product_uom_form_action" id="menu_product_uom_form_action" parent="base.menu_base_config" sequence="30" groups="product.group_uom"/>
-
+       -->
         <record id="product_uom_categ_form_view" model="ir.ui.view">
             <field name="name">product.uom.categ.form</field>
             <field name="model">product.uom.categ</field>
@@ -486,8 +710,8 @@
               </p>
             </field>
         </record>
-        <menuitem action="product_uom_categ_form_action" id="menu_product_uom_categ_form_action" parent="base.menu_base_config" sequence="25" groups="base.group_no_one"/>
-
+        <!--<menuitem action="product_uom_categ_form_action" id="menu_product_uom_categ_form_action" parent="base.menu_base_config" sequence="25" groups="base.group_no_one"/>
+        -->
         <record id="product_ul_form_view" model="ir.ui.view">
             <field name="name">product.ul.form.view</field>
             <field name="model">product.ul</field>
@@ -526,9 +750,9 @@
               </p>
             </field>
         </record>
-        <menuitem
+        <!--<menuitem
             action="product_ul_form_action" groups="product.group_stock_packaging" id="menu_product_ul_form_action" parent="prod_config_main" sequence="3"/>
-
+         -->
         <record id="product_packaging_tree_view" model="ir.ui.view">
             <field name="name">product.packaging.tree.view</field>
             <field name="model">product.packaging</field>
@@ -571,6 +795,7 @@
             </field>
         </record>
 
+<!--
         <record id="product_supplierinfo_form_view" model="ir.ui.view">
             <field name="name">product.supplierinfo.form.view</field>
             <field name="model">product.supplierinfo</field>
@@ -602,16 +827,22 @@
                 </form>
             </field>
         </record>
+-->
         <record id="product_supplierinfo_tree_view" model="ir.ui.view">
             <field name="name">product.supplierinfo.tree.view</field>
             <field name="model">product.supplierinfo</field>
             <field name="arch" type="xml">
-                <tree string="Supplier Information">
-                    <field name="sequence" widget="handle"/>
+                <tree string="Supplier Information" editable="bottom">
+                    
                     <field name="name"/>
+                    <field name="product_name"/>
                     <field name="delay"/>
                     <field name="min_qty"/>
-                    <field name="company_id" groups="base.group_multi_company" widget="selection"/>
+                    <field name="sequence" widget="handle"/>
+                    <field name="product_code"/>
+                    <field name="product_uom"/>
+                    <field name="company_id" groups="base.group_multi_company" widget="selection" invisible="1"/>
+                    
                 </tree>
             </field>
         </record>
@@ -623,7 +854,9 @@
                 <form string="Product Variant" version="7.0">
                     <group col="4">
                         <field name="product_tmpl_id"/>
+<!--
                         <field name="active"/>
+-->
                         <field name="variants"/>
                         <field name="default_code"/>
                         <field name="price_margin"/>
@@ -655,7 +888,7 @@
                 <tree string="Product Template">
                     <field name="name"/>
                     <field name="categ_id"/>
-                    <field name="type"/>
+                    <field name="type" invisible="1"/>
                     <field name="state"/>
                 </tree>
             </field>

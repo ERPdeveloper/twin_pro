@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+		<!-- Partner Form view start -->
+		
+        <record model="ir.ui.view" id="m_partner_form_view">
+        <field name="name">m_partner_form_view</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">	        
+        <xpath expr="//group" position="before">
+		<header>
+			<button name="entry_reject" class="oe_highlight" type="object" string="Reject" attrs = "{'invisible':[('partner_state','not in',('validated'))]}" confirm="Are you sure to proceed ?"/>
+			<button name="entry_validate" class="oe_highlight" type="object" string="Validate" attrs = "{'invisible':[('partner_state','not in',('draft'))]}" confirm="Are you sure to proceed ?"/>
+			<button name="entry_revert" class="oe_highlight" type="object" string="Revert" attrs = "{'invisible':[('partner_state','not in',('validated'))]}"/> 
+		</header>
+		</xpath>        
+       
+		<field name="country_id" position="replace">
+		<field name="country_id" readonly="1"/>
+		</field>
+		<field name="state_id" position="replace">
+		<field name="state_id" readonly="1"/>
+		</field>
+		<field name="city" position="after">
+		<field name="city_id" on_change="onchange_city(city_id)" style="width: 40%%" placeholder="City"  attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		</field>
+		<field name="is_company" position="replace">
+		<field name="is_company" invisible="1"/>
+		
+		<field name="tin_no" class="aplhanum_expect" required="1" attrs = "{'readonly':[('partner_state','=','validated')]}" string="GSTIN No."/>
+		</field>
+		
+		<field name="mobile" position="before">
+		<field name="sms_applicable" required="1" attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		</field>
+		
+		<field name="country_id" position="after">
+		<field name="region" attrs="{'readonly':[('partner_state','=','validated')],'invisible':[('customer','!=',True),('dealer','!=',True)]}"/>
+		</field>
+		<field name="email" position="before">
+		<field name="email_applicable" required="1" attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		</field>
+		<field name="zip" position="replace">
+		<field name="zip" on_change="onchange_zip(zip)" placeholder="ZIP" attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		<field name="language" invisible="1"/>
+		<field name="contact" invisible="1"/>
+		</field>
+		
+		<field name="birthdate" position="replace">
+		<field name="company_type" required="1"	attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		<field name="supply_type" attrs = "{'invisible':['|',('customer','=',True),('dealer','=',True)],'readonly':[('partner_state','=','validated')]}"/>
+		<field name="tds" attrs = "{'required':[('company_type','=','individual'),('customer','!=',True)],'invisible':[('customer','=',True)],'readonly':[('partner_state','=','validated')]}"/>
+		<field name="tan_no" class="aplhanum_expect" attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		<field name="cst_no" class="aplhanum_expect" attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		<field name="vat_no" class="aplhanum_expect" attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		<field name="cheque_in_favour" class="aplhanum_expect" attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		<field name="max_deal_discount" attrs="{'readonly':[('partner_state','=','validated')],'invisible':[('dealer','!=',True)]}"/>
+		<field name="max_cust_discount" attrs="{'readonly':[('partner_state','=','validated')],'invisible':[('customer','!=',True)]}"/>
+		<field name="max_spl_discount" attrs="{'readonly':[('partner_state','=','validated')],'invisible':[('customer','!=',True)]}"/>
+		<field name="economic_category" invisible="1"/>
+		<field name="dealer_id"  attrs="{'invisible':['|',('supplier','=',True),('dealer','=',True)],'readonly':[('partner_state','=','validated')]}"/>
+		</field>
+		<field name="ean13" position="replace">
+		<field name="grade" attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		<field name="pan_no" class="aplhanum_expect" attrs="{'readonly':[('partner_state','=','validated')]}" string="Pan No."/>
+		<field name="adhar_id" class="aplhanum_expect" attrs="{'readonly':[('partner_state','=','validated')]}" string="Aadhar NO."/>
+		<field name="gst_no" invisible="1" attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		<field name="gs_tin_no" invisible="1" attrs="{'readonly':[('partner_state','=','validated')],'invisible': [('supplier','!=',True),('customer','!=',True)]}"/>
+		<field name="transport_id" attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		<field name="sector" attrs="{'invisible': [('supplier','=',True)],'readonly': [('partner_state','=','validated')]}"/>
+		<field name="user_ref_id" invisible="1"/>
+		</field>
+		
+		<field name="ref" position="replace">
+		<field name="payment_id"/>
+		<div>
+			<label for="advance_limit"  string="Advance"  attrs="{'invisible': [('customer','=',True)]}"/>
+			<label for="advance_limit" string="Credit" attrs="{'invisible': [('supplier','=',True)]}"/>
+		</div>
+		<field name="advance_limit" nolabel="1"/>
+		</field>
+		
+		<xpath expr = "//group[@string='Terms and Conditions']" position="after">
+			<group string="Remarks" attrs="{'invisible':[('partner_state','not in',['validated'])]}">
+				<group>	
+					<field name="remark" attrs="{'readonly': [('partner_state','in',['validated'])]}"/>
+				</group>
+				<group>												
+					<field name="cancel_remark" attrs="{'invisible':[('partner_state','not in',['validated'])]}"/>
+				</group>
+			</group>
+		</xpath>
+		
+		<field name="mobile" position="after">
+		<field name="mobile_2" attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		</field>
+		
+		<field name="color" position="replace">
+		<field name="delivery_id" attrs = "{'invisible':[('dealer','=',True)]}"/>
+		</field>
+		
+		<field name="function" position="replace">
+		<field name="contact_person" class="aplhanum_expect" attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		</field>
+		<field name="title" position="replace">
+		<field name="group_flag" invisible="1"/>
+		<field name="contractor" invisible="1"/>
+		<field name="tin_flag" invisible="1"/>
+		</field>
+		<field name="city" position="replace">
+		<field name="city" invisible="1"/>
+		<field name="landmark" placeholder="Landmark" attrs="{'readonly':[('partner_state','=','validated')]}"/>
+		</field>
+		<field name="category_id" position="replace">
+		<field name="category_id" invisible="1"/>
+		<field name="con_designation" invisible="1"/>
+		<field name="con_whatsapp" invisible="1"/>
+		<field name="dealer" invisible="1"/> 
+		</field>
+		
+		<xpath expr = "//page[@string='Additional Contacts']" position="after">
+			<page string="Delivery Address" attrs="{'invisible':['|',('supplier','=',True),('dealer','=',True)]}">
+			<field colspan="4" mode="tree" name="delivery_ids" nolabel="1" widget="one2many_list" attrs="{'readonly':[('partner_state','=','validated')]}">
+				<tree string="Delivery Address"> 
+					<field name="landmark"/>
+					<field name="street" string="Street1"/>
+					<field name="street1" string="Street2"/>
+					<field name="city_id"/>
+					<field name="contact_no"/>
+					<field name="default"/>
+				</tree>
+				<form string="Delivery Address"	>
+					<group>
+						<group>
+							<field name="name" required="1"/>
+							<field name="landmark" placeholder="Landmark"/>
+							<field name="street" string="Street1" required="1"/>
+							<field name="street1" string="Street2"/>
+							<field name="city_id" required="1" on_change="onchange_city(city_id)"/>
+						</group>
+						<group>
+							<field name="contact_no" class="numberonly" required="1"/>
+							<field name="zip" class="numberonly"/>
+							<field name="state_id" readonly="1"/>
+							<field name="country_id" readonly="1"/>
+							<field name="default"/>
+						</group>
+					</group>
+				</form>
+			</field>
+			</page>
+		</xpath>
+		
+		<xpath expr = "//page[@string='Delivery Address']" position="after">
+			<page string="Billing Address">
+				
+				<field colspan="4" mode="tree" name="billing_ids" nolabel="1" widget="one2many_list" attrs="{'readonly':[('partner_state','=','validated')]}">
+					<tree string="Billing Address"> 
+						<field name="landmark"/>
+						<field name="street" string="Street"/>
+						<field name="city_id"/>
+						<field name="contact_no"/>
+						<field name="default"/>
+					</tree>
+					<form string="Billing Address"	>
+						<group>
+							<group>
+								<field name="name" required="1"/>
+								<field name="landmark" placeholder="Landmark" required="1"/>
+								<field name="street" string="Street" required="1"/>
+								<field name="city_id" required="1" on_change="onchange_city(city_id)"/>
+							</group>
+							<group>
+								<field name="contact_no" class="numberonly" required="1"/>
+								<field name="zip" class="numberonly" required="1"/>
+								<field name="state_id" readonly="1"/>
+								<field name="country_id" readonly="1"/>
+								<field name="default"/>
+							</group>
+						</group>
+					</form>
+				</field>
+				</page>
+				</xpath>
+		
+		<!-- Bank Tab Menu -->
+		
+		<xpath expr = "//page[@string='Billing Address']" position="after">
+				<page string="Bank Details" invisible="1">
+					<group>
+				<field name="bank_ids" nolabel="1" context="{'default_partner_id': active_id, 'form_view_ref': 'base.view_partner_bank_form'}" attrs="{'readonly':[('partner_state','=','validated')]}">
+				<form string="Bank" version="7.0">
+				<group>
+					<field name="acc_number" colspan="4" class="numberonly"/>
+					<group string="Bank Account Owner">
+						<field name="owner_name" class="aplhanum_expect"/>
+						<field name="street" class="aplhanum_expect"/>
+						<field name="city_id" on_change="onchange_city(city_id)"/>
+						<field name="state_id" readonly="1" string="State"/>
+						<field name="country_id" readonly="1"/>
+						<field name="zip"/>
+					</group>
+					<group string="Information About The Bank">
+						<field name="bank"/>
+						<field name="bank_name" class="aplhanum_expect"/>
+						<field name="bank_bic" class="numberonly"/>
+					</group>
+				</group>	
+			</form>
+			</field>
+			</group>
+			</page>	
+		</xpath>
+		<xpath expr = "//page[@string='Bank Details']" position="after">
+				<page string="Consultant Fee" attrs="{'invisible':[('dealer','!=',True)]}">
+				<field colspan="4" mode="tree" name="consult_ids" nolabel="1" widget="one2many_list" attrs="{'readonly':[('partner_state','=','validated')]}">
+					<tree string="Consult Fee" editable="bottom"> 
+						<field name="effective_date" attrs="{'readonly':[('read_flag','=',True)]}"/>
+						<field name="value" attrs="{'readonly':[('read_flag','=',True)]}"/>
+						<field name="state" readonly="1"/>
+						<field name="read_flag" readonly="1" invisible="1"/>
+					</tree>
+					<form string="Billing Address" >
+						<group>
+							<group>
+								<field name="effective_date"/>
+								<field name="value"/>
+							</group>
+							<group>
+								<field name="state" readonly="1"/>
+								<field name="read_flag" invisible="1"/>
+							</group>
+						</group>
+					</form>
+				</field>
+			</page>	
+		</xpath>
+		<xpath expr = "//page[@string='Consultant Fee']" position="after">
+			<page string="Log Info">
+				<group>
+					<group>
+						<field name="company_id"/>
+					</group>
+					<group>
+						<field name="active"/>
+					</group>
+					<group>
+						<field name="crt_user_id"/>
+						<field name="validated_user_id" attrs="{'invisible':[('partner_state','in',['draft'])]}"/>
+						<field name="rejected_user_id" attrs="{'invisible':[('partner_state','not in',['rejected'])]}"/>
+						<field name="updated_user_id"/>
+					</group>
+					<group>
+						<field name="crt_date"/>
+						<field name="validated_date" attrs="{'invisible':[('partner_state','in',['draft'])]}"/>
+						<field name="rejected_date" attrs="{'invisible':[('partner_state','not in',['rejected'])]}"/>
+						<field name="updated_date"/>
+						<field name="source_mode"/>
+					</group>
+				</group>
+			</page>
+		</xpath>
+<!--
+		<xpath expr = "//page[@string='Accounting']" position="replace">
+			<page string="Accounting" invisible="1">
+				<group>
+					
+				</group>	
+			</page>	
+		</xpath>
+-->
+		</field>
+	</record>
+	
+	<!-- Partner form view end -->
+	
+	<record model="ir.ui.view" id="m_partner_tree">
+		<field name="name">res.partner.form</field>
+		<field name="model">res.partner</field>
+		<field name="inherit_id" ref="base.view_partner_tree"/>
+		<field name="arch" type="xml">
+			<field name="name" position="after"> 
+			<field name="contact_person"/> 
+			<field name="mobile"/> 
+			</field>					
+			<field name="phone" position="replace"> 
+			<field name="phone" invisible="1"/> 
+			</field>					
+			<field name="email" position="after"> 
+			<field name="supply_type"/> 
+			<field name="dealer" invisible="1"/>
+			</field>					
+		</field>
+	</record>
+	
+	<!-- contractor tree view -->
+	
+	<record id="m_contractor_tree_1" model="ir.ui.view">
+		<field name="name">Contractor Tree</field>
+		<field name="model">res.partner</field>
+		<field eval="8" name="priority"/>
+		<field name="arch" type="xml">	
+		<tree colors="blue:partner_state == 'draft';black:partner_state == 'validated';gray:partner_state == 'rejected'" toolbar="True" string="Contractor Master">									
+				<field name="name"/>
+				<field name="contact_person"/>
+				<field name="mobile"/>
+				<field name="email"/>
+				<field name="partner_state"/>				
+			</tree>
+		</field>
+	</record>
+	
+	<!-- End Tree view -->
+	
+	<!-- Audit Log Xml Data Start-->
+	
+      <!--  <record id="partnermaster_model" model="audittrail.rule">
+            <field name="name">Audit Log Partner Master</field>
+            <field name="object_id" eval="ref('base.model_res_partner')"/>       
+            <field name="state">subscribed</field>              
+        </record>-->
+	
+	<!-- Audit Log Xml Data End-->
+	
+	<record id="m_action_customer_form" model="ir.actions.act_window">
+		<field name="name">Customer</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">res.partner</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+		<field name="view_id" ref="m_partner_tree"/>
+		<field name="context">{'default_customer': True,'default_supplier': False,'default_contractor': False,'default_dealer': False,'default_group_flag': False}</field>
+		<field name="domain">[('customer','=',True),('contact','=',False)]</field>		
+	</record>
+	
+	<record id="m_action_dealer_form" model="ir.actions.act_window">
+		<field name="name">Dealer</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">res.partner</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+		<field name="view_id" ref="m_partner_tree"/>
+		<field name="context">{'default_dealer': True,'default_customer': False,'default_supplier': False,'default_contractor': False,'default_group_flag': False}</field>
+		<field name="domain">[('dealer','=',True),('contact','=',False)]</field>	
+	</record>
+	
+	<record id="m_action_contractor_form_1" model="ir.actions.act_window">
+		<field name="name">Contractor</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">res.partner</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+		<field name="view_id" ref="m_contractor_tree_1"/>
+		<field name="context">{'default_contractor': True,'default_dealer': False,'default_customer': False,'default_supplier': False,'default_group_flag': False,'default_tin_flag': True}</field>
+		<field name="domain">[('contractor','=',True),('contact','=',False)]</field>		
+	</record>
+	
+	<record id="m_action_group_form" model="ir.actions.act_window">
+		<field name="name">Groups</field>
+		<field name="type">ir.actions.act_window</field>
+		<field name="res_model">res.partner</field>
+		<field name="view_type">form</field>
+		<field name="view_mode">tree,form</field>
+		<field name="view_id" ref="m_partner_tree"/>
+		<field name="context">{'default_group_flag': True,'default_dealer': False,'default_customer': False,'default_supplier': False,'default_contractor': False}</field>
+		<field name="domain">[('group_flag','=',True),('contact','=',False)]</field>		
+	</record>
+	
+	<!-- Menu items -->
+	
+    <!--  Supplier Master  --> 
+	<menuitem action="base.action_partner_supplier_form" name="Supplier" id="mam_supplier_master" parent="parent_menus.mrm_contacts_masters" sequence="1"/>
+	
+	<!-- Customer Master -->
+	<menuitem action="m_action_customer_form" id="cam_crm_customer_master" name="Customer" parent="parent_menus.mrm_contacts_masters" sequence="2"/>
+	
+	<!-- Dealer Master -->
+	<menuitem action="m_action_dealer_form" id="cam_crm_dealer_master" name="Dealer" parent="parent_menus.mrm_contacts_masters" sequence="3"/>
+	
+	
+    </data>
+</openerp>

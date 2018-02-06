@@ -303,6 +303,7 @@
             </field>
         </record>
 
+<!--
         <record id="product_search_form_view_procurment" model="ir.ui.view">
             <field name="name">product.search.procurment.form</field>
             <field name="model">product.product</field>
@@ -314,14 +315,15 @@
             </field>
         </record>
 
+
         <record model="ir.ui.view" id="product_form_view_procurement_button">
             <field name="name">product.product.procurement</field>
             <field name="model">product.product</field>
             <field name="inherit_id" ref="product.product_normal_form_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[@name='buttons']" position="inside">
-                    <button string="Request Procurement" name="%(act_make_procurement)d" type="action"/>
-                    <button string="Orderpoints" name="%(product_open_orderpoint)d" type="action"/>
+                    <button string="Request Procurement" name="%(act_make_procurement)d" type="action" invisible="1"/>
+                    <button string="Orderpoints" name="%(product_open_orderpoint)d" type="action" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='cost_method']" position="before">
                     <field name="procure_method" groups="base.group_user"/>
@@ -352,6 +354,6 @@
                 </xpath>
             </field>
         </record>
-
+-->
     </data>
 </openerp>
