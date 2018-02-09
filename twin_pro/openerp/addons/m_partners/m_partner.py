@@ -269,7 +269,7 @@ class m_partner(osv.osv):
 	
 	_constraints = [
 		
-		(_validations,' ',[' ']),
+		#~ (_validations,' ',[' ']),
 		#~ (_name_validate, ' ', [' ']),
 		
 		]
