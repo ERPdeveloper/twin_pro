@@ -97,38 +97,6 @@ class product_uom(osv.osv):
 	_name = 'product.uom'
 	_description = 'Product Unit of Measure'
 	
-	def _get_modify(self, cr, uid, ids, field_name, arg,  context=None):
-		res={}
-		if field_name == 'modify':
-			for h in self.browse(cr, uid, ids, context=None):
-				res[h.id] = 'no'
-				if h.dummy_state == 'approved':
-					cr.execute(""" select * from 
-					(SELECT tc.table_schema, tc.constraint_name, tc.table_name, kcu.column_name, ccu.table_name
-					AS foreign_table_name, ccu.column_name AS foreign_column_name
-					FROM information_schema.table_constraints tc
-					JOIN information_schema.key_column_usage kcu ON tc.constraint_name = kcu.constraint_name
-					JOIN information_schema.constraint_column_usage ccu ON ccu.constraint_name = tc.constraint_name
-					WHERE constraint_type = 'FOREIGN KEY'
-					AND ccu.table_name='%s')
-					as sam  """ %('product_uom'))
-					data = cr.dictfetchall()	
-					if data:
-						for var in data:
-							data = var
-							chk_sql = 'Select COALESCE(count(*),0) as cnt from '+str(data['table_name'])+' where '+data['column_name']+' = '+str(ids[0])
-							cr.execute(chk_sql)			
-							out_data = cr.dictfetchone()
-							if out_data:
-								if out_data['cnt'] > 0:
-									res[h.id] = 'yes'
-									return res
-								else:
-									res[h.id] = 'no'
-				else:
-					res[h.id] = 'yes'								
-		return res
-	
 	def _compute_factor_inv(self, factor):
 		return factor and (1.0 / factor) or 0.0
 
@@ -194,31 +162,26 @@ class product_uom(osv.osv):
 		'uom_type': fields.selection([('bigger','Bigger than the reference Unit of Measure'),
 									  ('reference','Reference Unit of Measure for this category'),
 									  ('smaller','Smaller than the reference Unit of Measure')],'Type'),
-		
-		'uom_category': fields.selection([('length','Length'),('other','Others')],'Type',required=True),
-							  
-		'rej_user_id': fields.many2one('res.users', 'Rejected By', readonly=True),
-		'dummy_state': fields.selection([('draft','Draft'),('confirm','WFA'),('approved','Approved'),
-				('reject','Rejected'),('cancel','Cancelled')],'Status', readonly=True),
-		'remark': fields.text('Remarks',readonly=False),
-		'cancel_remark': fields.text('Cancel Remarks'),
-		'entry_mode': fields.selection([('auto','Auto'),('manual','Manual')],'Entry Mode', readonly=True),
-		
-			### Entry Info ###
-		'crt_date': fields.datetime('Created Date',readonly=True),
-		'user_id': fields.many2one('res.users', 'Created By', readonly=True),
-		'confirm_date': fields.datetime('Confirmed Date', readonly=True),
-		'confirm_user_id': fields.many2one('res.users', 'Confirmed By', readonly=True),
-		'ap_rej_date': fields.datetime('Approved/Rejected Date', readonly=True),
-		'ap_rej_user_id': fields.many2one('res.users', 'Approved/Rejected By', readonly=True),			
-		'update_date': fields.datetime('Last Updated Date', readonly=True),
-		'update_user_id': fields.many2one('res.users', 'Last Updated By', readonly=True),
-		'cancel_date': fields.datetime('Cancelled Date', readonly=True),
-		'cancel_user_id': fields.many2one('res.users', 'Cancelled By', readonly=True),
-		'approve_date': fields.datetime('Approved Date', readonly=True),
-		'app_user_id': fields.many2one('res.users', 'Approved By', readonly=True),
-		'modify': fields.function(_get_modify, string='Modify', method=True, type='char', size=3),
+				
+		'dummy_state': fields.selection([('draft','Draft'),('validated','Validated'),('rejected','Rejected')],'Status', readonly=True),
+		'remark': fields.text('Rejected For'),
+		'source_mode': fields.selection([('auto','Auto'),('manual','Manual')],'Source Mode', readonly=True),
 		'notes': fields.text('Notes'),
+		
+		# Entry Info
+		
+		'company_id': fields.many2one('res.company', 'Company Name',readonly=True),
+		'active': fields.boolean('Active'),
+		'crt_date': fields.datetime('Created On',readonly=True),
+		'user_id': fields.many2one('res.users', 'Created By', readonly=True),
+		'crt_user_id': fields.many2one('res.users', 'Created By', readonly=True),
+		'validated_date': fields.datetime('Validated On', readonly=True),
+		'validated_user_id': fields.many2one('res.users', 'Validated By', readonly=True),
+		'rejected_date': fields.datetime('Rejected On', readonly=True),
+		'rejected_user_id': fields.many2one('res.users', 'Rejected By', readonly=True),
+		'updated_date': fields.datetime('Recent Update On', readonly=True),
+		'updated_user_id': fields.many2one('res.users', 'Recent Update By', readonly=True),
+		
 	}
 
 	_defaults = {
@@ -229,65 +192,47 @@ class product_uom(osv.osv):
 		'crt_date': lambda * a: time.strftime('%Y-%m-%d %H:%M:%S'),
 		'dummy_state': 'draft',
 		'user_id': lambda obj, cr, uid, context: uid,
+		'crt_user_id': lambda obj, cr, uid, context: uid,
 		'company_id': lambda self,cr,uid,c: self.pool.get('res.company')._company_default_get(cr, uid, 'product.uom', context=c),
-		'modify': 'yes',
-		'entry_mode': 'manual',
+		'source_mode': 'manual',
 		
 	}
-
+	
 	_sql_constraints = [
 		('factor_gt_zero', 'CHECK (factor!=0)', 'The conversion ratio for a unit of measure cannot be 0!'),
 		('name', 'unique(name)', 'UOM name must be unique!'),
 	]
-
-	def entry_confirm(self,cr,uid,ids,context=None):
-		rec = self.browse(cr,uid,ids[0])
-		if rec.dummy_state == 'draft':
-			self.write(cr, uid, ids, {'dummy_state': 'confirm','confirm_user_id': uid, 'confirm_date': time.strftime('%Y-%m-%d %H:%M:%S')})
-		return True
-
-	def entry_approve(self,cr,uid,ids,context=None):
-		rec = self.browse(cr,uid,ids[0])
-		if rec.dummy_state == 'confirm':
-			self.write(cr, uid, ids, {'dummy_state': 'approved','ap_rej_user_id': uid, 'ap_rej_date': time.strftime('%Y-%m-%d %H:%M:%S')})
-		return True
-
-	def entry_reject(self,cr,uid,ids,context=None):
-		rec = self.browse(cr,uid,ids[0])
-		if rec.dummy_state == 'confirm':
-			if rec.remark:
-				self.write(cr, uid, ids, {'dummy_state': 'reject','ap_rej_user_id': uid, 'ap_rej_date': time.strftime('%Y-%m-%d %H:%M:%S')})
-			else:
-				raise osv.except_osv(_('Rejection remark is must !!'),
-					_('Enter rejection remark in remark field !!'))
-		return True
 	
-	def entry_cancel(self,cr,uid,ids,context=None):
+	def entry_revert(self,cr,uid,ids,context=None):
 		rec = self.browse(cr,uid,ids[0])
-		if rec.dummy_state == 'approved':
-			if rec.cancel_remark:
-				self.write(cr, uid, ids, {'dummy_state': 'cancel','cancel_user_id': uid, 'cancel_date': time.strftime('%Y-%m-%d %H:%M:%S')})
-			else:
-				raise osv.except_osv(_('Cancel remark is must !!'),
-					_('Enter the remarks in Cancel remarks field !!'))
-		return True
-	
-	def entry_draft(self,cr,uid,ids,context=None):
-		rec = self.browse(cr,uid,ids[0])
-		if rec.dummy_state == 'approved':
+		if rec.dummy_state == 'validated':
 			self.write(cr, uid, ids, {'dummy_state': 'draft'})
 		return True
-			
+	
+	def entry_validate(self,cr,uid,ids,context=None):
+		rec = self.browse(cr,uid,ids[0])
+		if rec.dummy_state == 'draft':
+			self.write(cr, uid, ids, {'dummy_state': 'validated','validated_user_id': uid, 'validated_date': time.strftime('%Y-%m-%d %H:%M:%S')})
+		return True
+	
+	def entry_reject(self,cr,uid,ids,context=None):
+		rec = self.browse(cr,uid,ids[0])
+		if rec.dummy_state == 'validated':
+			if rec.remark:
+				self.write(cr, uid, ids, {'dummy_state': 'rejected','rejected_user_id': uid, 'rejected_date': time.strftime('%Y-%m-%d %H:%M:%S')})
+			else:
+				raise osv.except_osv(_('Warning !'),_('Enter Reason For rejection.'))
+		return True
+	
 	def unlink(self,cr,uid,ids,context=None):
 		unlink_ids = []		
 		for rec in self.browse(cr,uid,ids):	
-			if rec.dummy_state != 'draft' and rec.dummy_state != 'reject':			
-				raise osv.except_osv(_('Warning!'),
-						_('You can not delete this entry !!'))
+			if rec.dummy_state not in ('draft'):
+				raise osv.except_osv(_('Warning !'),_('Draft only can be deleted.'))
 			else:
 				unlink_ids.append(rec.id)
 		return osv.osv.unlink(self, cr, uid, unlink_ids, context=context)
-
+	
 	def _compute_qty(self, cr, uid, from_uom_id, qty, to_uom_id=False):
 		if not from_uom_id or not qty or not to_uom_id:
 			return qty
@@ -297,7 +242,7 @@ class product_uom(osv.osv):
 		else:
 			from_unit, to_unit = uoms[-1], uoms[0]
 		return self._compute_qty_obj(cr, uid, from_unit, qty, to_unit)
-
+	
 	def _compute_qty_obj(self, cr, uid, from_unit, qty, to_unit, context=None):
 		if context is None:
 			context = {}
@@ -308,7 +253,7 @@ class product_uom(osv.osv):
 				return qty
 		amount = qty
 		return amount
-
+	
 	def _compute_price(self, cr, uid, from_uom_id, price, to_uom_id=False):
 		if not from_uom_id or not price or not to_uom_id:
 			return price
@@ -323,12 +268,12 @@ class product_uom(osv.osv):
 		if to_uom_id:
 			amount = amount / to_unit.factor 
 		return amount
-
+	
 	def onchange_type(self, cursor, user, ids, value):
 		if value == 'reference':
 			return {'value': {'factor': 1, 'factor_inv': 1}}
 		return {}
-
+	
 	def write(self, cr, uid, ids, vals, context=None):
 		v_name = None 
 		v_code = None
@@ -340,7 +285,7 @@ class product_uom(osv.osv):
 		if vals.get('name'): 
 			v_name = vals['name'].strip() 
 			vals['name'] = v_name.capitalize() 
-		vals.update({'update_date': time.strftime('%Y-%m-%d %H:%M:%S'),'update_user_id':uid})
+		vals.update({'updated_date': time.strftime('%Y-%m-%d %H:%M:%S'),'updated_user_id':uid})
 		return super(product_uom, self).write(cr, uid, ids, vals, context=context)
 	
 	def _Validation(self, cr, uid, ids, context=None):
@@ -351,7 +296,7 @@ class product_uom(osv.osv):
 		return True		
 		
 	_constraints = [
-	
+		
 		(_Validation, 'Special Character Not Allowed !!!', ['Check Name']),
 	]
 
@@ -390,38 +335,7 @@ class product_category(osv.osv):
 	def _name_get_fnc(self, cr, uid, ids, prop, unknow_none, context=None):
 		res = self.name_get(cr, uid, ids, context=context)
 		return dict(res)
-	
-	def _get_modify(self, cr, uid, ids, field_name, arg,  context=None):
-		res={}
-		if field_name == 'modify':
-			for h in self.browse(cr, uid, ids, context=None):
-				res[h.id] = 'no'
-				if h.state == 'approved':
-					cr.execute(""" select * from 
-					(SELECT tc.table_schema, tc.constraint_name, tc.table_name, kcu.column_name, ccu.table_name
-					AS foreign_table_name, ccu.column_name AS foreign_column_name
-					FROM information_schema.table_constraints tc
-					JOIN information_schema.key_column_usage kcu ON tc.constraint_name = kcu.constraint_name
-					JOIN information_schema.constraint_column_usage ccu ON ccu.constraint_name = tc.constraint_name
-					WHERE constraint_type = 'FOREIGN KEY'
-					AND ccu.table_name='%s')
-					as sam  """ %('product_category'))
-					data = cr.dictfetchall()	
-					if data:
-						for var in data:
-							data = var
-							chk_sql = 'Select COALESCE(count(*),0) as cnt from '+str(data['table_name'])+' where '+data['column_name']+' = '+str(ids[0])
-							cr.execute(chk_sql)			
-							out_data = cr.dictfetchone()
-							if out_data:
-								if out_data['cnt'] > 0:
-									res[h.id] = 'yes'
-									return res
-								else:
-									res[h.id] = 'no'
-				else:
-					res[h.id] = 'yes'								
-		return res
+
 	
 	_name = "product.category"
 	_description = "Product Category"
@@ -437,49 +351,39 @@ class product_category(osv.osv):
 		'parent_left': fields.integer('Left Parent', select=1),
 		'parent_right': fields.integer('Right Parent', select=1),
 		'category_code':fields.char('Code',size=20),
-		'state': fields.selection([('draft','Draft'),('confirm','WFA'),('approved','Approved'),
-				('reject','Rejected'),('cancel','Cancelled')],'Status', readonly=True),
-		'remark': fields.text('Approve/Reject Remarks',readonly=False,states={'approved':[('readonly',True)]}),
-		'company_id': fields.many2one('res.company', 'Company Name',readonly=True),
+		'state': fields.selection([('draft','Draft'),('validated','Validated'),('rejected','Rejected')],'Status', readonly=True),
+		'remark': fields.char('Rejected For'),
 		'flag_isparent': fields.boolean('Is Parent'),
-		'cancel_remark': fields.text('Cancel Remarks'),
 		'code': fields.char('Code'),
-		'modify': fields.function(_get_modify, string='Modify', method=True, type='char', size=3),
 		'notes':fields.text('Notes'),
-		
+		'source_mode': fields.selection([('auto','Auto'),('manual','Manual')],'Source Mode', readonly=True),
 		
 		# Entry Info
 		
-		'active':fields.boolean('Active'),
-		'creation_date':fields.datetime('Created Date',readonly=True),
+		'company_id': fields.many2one('res.company', 'Company Name',readonly=True),
+		'active': fields.boolean('Active'),
+		'crt_date': fields.datetime('Created On',readonly=True),
+		'crt_user_id': fields.many2one('res.users', 'Created By', readonly=True),
 		'user_id': fields.many2one('res.users', 'Created By', readonly=True),
-		'approve_date': fields.datetime('Approved Date', readonly=True),
-		'app_user_id': fields.many2one('res.users', 'Approved By', readonly=True),
-		'confirm_date': fields.datetime('Confirmed Date', readonly=True),
-		'conf_user_id': fields.many2one('res.users', 'Confirmed By', readonly=True),
-		'reject_date': fields.datetime('Rejected Date', readonly=True),
-		'rej_user_id': fields.many2one('res.users', 'Rejected By', readonly=True),
-		'cancel_date': fields.datetime('Cancelled Date', readonly=True),
-		'cancel_user_id': fields.many2one('res.users', 'Cancelled By', readonly=True),
-		'update_date': fields.datetime('Last Updated Date', readonly=True),
-		'update_user_id': fields.many2one('res.users', 'Last Updated By', readonly=True),
+		'validated_date': fields.datetime('Validated On', readonly=True),
+		'validated_user_id': fields.many2one('res.users', 'Validated By', readonly=True),
+		'rejected_date': fields.datetime('Rejected On', readonly=True),
+		'rejected_user_id': fields.many2one('res.users', 'Rejected By', readonly=True),
+		'updated_date': fields.datetime('Recent Update On', readonly=True),
+		'updated_user_id': fields.many2one('res.users', 'Recent Update By', readonly=True),
 		
 	}
-	
-	_sql_constraints = [
-		('name', 'unique(name)', 'Category name must be unique!'),
-		
-	]
 	
 	_defaults = {
 		
 		'type': lambda *a : 'normal',
 		'active': True,
-		'creation_date': lambda * a: time.strftime('%Y-%m-%d %H:%M:%S'),
+		'crt_date': lambda * a: time.strftime('%Y-%m-%d %H:%M:%S'),
+		'source_mode': 'manual',
 		'state': 'draft',
 		'user_id': lambda obj, cr, uid, context: uid,
+		'crt_user_id': lambda obj, cr, uid, context: uid,
 		'company_id': lambda self,cr,uid,c: self.pool.get('res.company')._company_default_get(cr, uid, 'product.category', context=c),
-		'modify': 'yes',
 		
 	}
 	
@@ -488,77 +392,54 @@ class product_category(osv.osv):
 	_parent_order = 'sequence, name'
 	_order = 'parent_left'
 	
-	"""
-	def write(self, cr, uid, ids, vals, context=None):
-		v_name = None 
-		v_code = None
-		if vals.get('name'): 
-			v_name = vals['name'].strip() 
-			vals['name'] = v_name.capitalize() 
-		if vals.get('category_code'):
-			v_code = vals['category_code'].strip()
-			vals['category_code'] = v_code.capitalize()
-		result = super(product_category,self).write(cr, uid, ids, vals, context=context)	
-		return result
-
-	def create(self, cr, uid, vals, context=None):
-		v_name = None 
-		v_code = None
-		if vals.get('name'): 
-			v_name = vals['name'].strip() 
-			vals['name'] = v_name.capitalize() 
-		if vals.get('category_code'):
-			v_code = vals['category_code'].strip()
-			vals['category_code'] = v_code.capitalize()
-		result = super(product_category,self).create(cr, uid, vals,context=context)	
-		return result
-	"""
-	def entry_confirm(self,cr,uid,ids,context=None):
-		rec = self.browse(cr, uid, ids[0])
+	def _validations(self, cr, uid,ids, context=None):
+		rec = self.browse(cr,uid,ids[0])
+		if rec.name:
+			cr.execute(""" select upper(name) from product_category where upper(name) = '%s' """ %(rec.name.upper()))
+			data = cr.dictfetchall()
+			if len(data) > 1:
+				raise osv.except_osv(_('Warning !'),_('Category already exists'))
+		if rec.code:
+			cr.execute(""" select upper(code) from product_category where upper(code) = '%s' """ %(rec.code.upper()))
+			data = cr.dictfetchall()
+			if len(data) > 1:
+				raise osv.except_osv(_('Warning !'),_('Category Code already exists'))
+		return True
+	
+	def entry_revert(self,cr,uid,ids,context=None):
+		rec = self.browse(cr,uid,ids[0])
+		if rec.state == 'validated':
+			self.write(cr, uid, ids, {'state': 'draft'})
+		return True
+	
+	def entry_validate(self,cr,uid,ids,context=None):
+		rec = self.browse(cr,uid,ids[0])
 		if rec.state == 'draft':
-			self.write(cr, uid, ids, {'state': 'confirm','conf_user_id': uid, 'confirm_date': time.strftime('%Y-%m-%d %H:%M:%S')})
+			self.write(cr, uid, ids, {'state': 'validated','validated_user_id': uid, 'validated_date': time.strftime('%Y-%m-%d %H:%M:%S')})
 		return True
 	
 	def entry_reject(self,cr,uid,ids,context=None):
 		rec = self.browse(cr,uid,ids[0])
-		if rec.state == 'confirm':
+		if rec.state == 'validated':
 			if rec.remark:
-				self.write(cr, uid, ids, {'state': 'reject','rej_user_id': uid, 'reject_date': time.strftime('%Y-%m-%d %H:%M:%S')})
+				self.write(cr, uid, ids, {'state': 'rejected','rejected_user_id': uid, 'rejected_date': time.strftime('%Y-%m-%d %H:%M:%S')})
 			else:
-				raise osv.except_osv(_('Rejection remark is must !!'),
-					_('Enter rejection remark in remark field !!'))
+				raise osv.except_osv(_('Warning !'),_('Enter Reason For rejection.'))
 		return True
 	
-	def entry_cancel(self,cr,uid,ids,context=None):
-		rec = self.browse(cr,uid,ids[0])
-		if rec.state in ('approved','reject'):
-			if rec.cancel_remark:
-				self.write(cr, uid, ids, {'state': 'cancel','cancel_user_id': uid, 'cancel_date': time.strftime('%Y-%m-%d %H:%M:%S')})
-			else:
-				raise osv.except_osv(_('Cancel remark is must !!'),
-					_('Enter the remarks in Cancel remarks field !!'))
-		return True
-	
-	def entry_draft(self,cr,uid,ids,context=None):
-		rec = self.browse(cr, uid, ids[0])
-		if rec.state == 'approved':
-			self.write(cr, uid, ids, {'state': 'draft'})
-		return True
-			
-	def write(self, cr, uid, ids, vals, context=None):	  
-		vals.update({'update_date': time.strftime('%Y-%m-%d %H:%M:%S'),'update_user_id':uid})
-		return super(product_category, self).write(cr, uid, ids, vals, context)
-			
 	def unlink(self,cr,uid,ids,context=None):
-		unlink_ids = []		
-		for rec in self.browse(cr,uid,ids):	
-			if rec.state != 'draft':			
-				raise osv.except_osv(_('Warning!'),
-						_('You can not delete this entry !!'))
+		unlink_ids = []
+		for rec in self.browse(cr,uid,ids):
+			if rec.state not in ('draft'):
+				raise osv.except_osv(_('Warning !'),_('Draft only can be deleted.'))
 			else:
 				unlink_ids.append(rec.id)
 		return osv.osv.unlink(self, cr, uid, unlink_ids, context=context)
 	
+	def write(self, cr, uid, ids, vals, context=None):
+		vals.update({'updated_date': time.strftime('%Y-%m-%d %H:%M:%S'),'updated_user_id':uid})
+		return super(product_category, self).write(cr, uid, ids, vals, context)
+
 	def _check_recursion(self, cr, uid, ids, context=None):
 		level = 100
 		while len(ids):
@@ -568,27 +449,11 @@ class product_category(osv.osv):
 				return False
 			level -= 1
 		return True
-		
-	def _Validation(self, cr, uid, ids, context=None):
-		flds = self.browse(cr , uid , ids[0])
-		name_special_char = ''.join( c for c in flds.name if  c in '!@#$%^~*{}?+/=' )		
-		if name_special_char:
-			return False		
-		return True	
-		
-	def _Unique_name(self, cr, uid, ids, context=None):
-		rec = self.browse(cr,uid,ids[0])
-		cr.execute(""" select name from product_category where name  = '%s' and id != %s """ %(rec.name,rec.id))
-		data = cr.dictfetchall()
-		print "----------------------------------------------------------------------------------------",data
-		if data:
-			return False
-		return True
 
 	_constraints = [
 		(_check_recursion, 'Error ! You cannot create recursive categories.', ['parent_id']),
-		(_Validation, 'Special Character Not Allowed !!!', ['Check Name']),
-		(_Unique_name, 'This Category Name already exists !!!', ['Check Name']),
+		(_validations, ' Validations of Category master ', ['']),
+
 	]
 	def child_get(self, cr, uid, ids):
 		return [ids]
@@ -890,7 +755,6 @@ class product_product(osv.osv):
 		'minimum_qty':fields.integer('Minimum Stock Qty'),
 		'reorder_qty':fields.integer('Re-Order Qty'),
 		'stock_in_hand':fields.integer('Stock In Hand'),
-		'creation_date':fields.datetime('Created Date',readonly=True),
 		# image: all image fields are base64 encoded and PIL-supported
 		'image': fields.binary("Image",
 			help="This field holds the image used as image for the product, limited to 1024x1024px."),
@@ -916,7 +780,7 @@ class product_product(osv.osv):
 		'seller_id': fields.function(_calc_seller, type='many2one', relation="res.partner", string='Main Supplier', help="Main Supplier who has highest priority in Supplier List.", multi="seller_info"),
 	    'product_status':fields.selection([('approve', 'Approved'), ('not_approve', 'Waiting For Approval')], 'Product Status', readonly=True),
 		'state': fields.selection([('draft','Draft'),('validated','Validated'),('rejected','Rejected')],'Status', readonly=True),
-				
+		
 		'flag_qc_notreq': fields.boolean('QC Not Required'),
 		'flag_minqty_rule': fields.boolean('Minimum Qty Rule Applicable'),
 		'flag_expiry_alert': fields.boolean('Expiry Alert'),
@@ -925,17 +789,14 @@ class product_product(osv.osv):
 		'tolerance_plus': fields.float('Tolerance(+ %)'),
 		'tolerance_minus': fields.float('Tolerance(- %)'),
 		'tolerance_applicable': fields.boolean('Tolerance Applicable?'),
-		'is_accessories': fields.boolean('Is Accessories?'),
-		'rate_type': fields.selection([('purchase_item','Purchase Item'),('design_item','Design Item'),('mkt_item','MKT Item')],'Category'),
 		
 		#Entry Info
 		
-		'crt_date': fields.datetime('Created Date',readonly=True),
-		'user_id': fields.many2one('res.users', 'Created By', readonly=True),
-		'update_date': fields.datetime('Last Updated Date', readonly=True),
-		'update_user_id': fields.many2one('res.users', 'Last Updated By', readonly=True),
 		'company_id': fields.many2one('res.company','Company Name',readonly=True),
-		
+		'user_id': fields.many2one('res.users', 'Created By', readonly=True),
+		'update_user_id': fields.many2one('res.users', 'Updated By', readonly=True),
+		'creation_date': fields.datetime('Created On',readonly=True),
+		'update_date': fields.datetime('Updated On',readonly=True),
 	}
 	
 	_sql_constraints = [
@@ -946,10 +807,8 @@ class product_product(osv.osv):
 		
 		'company_id': lambda self,cr,uid,c: self.pool.get('res.company')._company_default_get(cr, uid, 'product.product', context=c),
 		'active': True,
-		'creation_date': lambda * a: time.strftime('%Y-%m-%d %H:%M:%S'),
 		'product_status': 'not_approve',
 		'state': 'draft',
-		'is_accessories': False,
 		'tolerance_applicable': True,
 		'tolerance_plus': 10,
 		
@@ -957,21 +816,7 @@ class product_product(osv.osv):
 	
 	def approve_product(self, cr, uid, ids, context=None):
 		return self.write(cr, uid, ids, {'product_status':'approve'})
-	"""
-	def write(self, cr, uid, ids, vals, context=None): 
-		v_name = None 
-		v_code = None
-		if vals.get('name'): 
-			v_name = vals['name'].strip() 
-			vals['name'] = v_name.capitalize() 
-		if vals.get('product_code'):
-			v_code = vals['product_code'].strip()
-			vals['product_code'] = v_code.capitalize()
-				
-		result = super(product_product,self).write(cr, uid, ids, vals, context=context) 
-		return result
-	"""
-
+	
 	def create(self, cr, uid, vals, context=None): 
 		print"createvalsvals",vals
 		#v_name = None 
@@ -999,7 +844,7 @@ class product_product(osv.osv):
 		return result
 
 	def write(self, cr, uid, ids, vals, context=None):	  
-		vals.update({'update_date': time.strftime('%Y-%m-%d %H:%M:%S'),'update_user_id':uid})
+		vals.update({'updated_date': time.strftime('%Y-%m-%d %H:%M:%S'),'updated_user_id':uid})
 		return super(product_product, self).write(cr, uid, ids, vals, context)
 		
 	"""

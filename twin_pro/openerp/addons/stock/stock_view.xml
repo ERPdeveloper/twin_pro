@@ -7,16 +7,17 @@
             id="menu_stock_root"
             groups="group_stock_manager,group_stock_user"
             sequence="70"/>
-
-        <menuitem id="menu_stock_warehouse_mgmt" name="Receive/Deliver By Orders" parent="menu_stock_root" sequence="1"/>
-        <menuitem id="menu_stock_products_moves" name="Receive/Deliver Products" parent="menu_stock_root" sequence="2"/>
-        <menuitem id="menu_stock_product" name="Products" parent="menu_stock_root" sequence="6"/>
-        <menuitem name="Products by Category" id="menu_product_by_category_stock_form" action="product.product_category_action"
+		
+    <!--<menuitem id="menu_stock_warehouse_mgmt" name="Receive/Deliver By Orders" parent="menu_stock_root" sequence="1"/>
+		<menuitem id="menu_stock_products_moves" name="Receive/Deliver Products" parent="menu_stock_root" sequence="2"/>-->
+	<!--<menuitem id="menu_stock_product" name="Products" parent="menu_stock_root" sequence="6"/>
+		<menuitem name="Products by Category" id="menu_product_by_category_stock_form" action="product.product_category_action"
             parent="stock.menu_stock_product" sequence="0"/>
         <menuitem action="product.product_normal_action" id="menu_stock_products_menu" parent="menu_stock_product" sequence="1"/>
+        -->
         <menuitem id="menu_stock_configuration" name="Configuration" parent="menu_stock_root" sequence="15" groups="group_stock_manager"/>
         <menuitem id="menu_warehouse_config" name="Warehouse Management" parent="menu_stock_configuration" sequence="40" groups="base.group_no_one"/>
-        <menuitem id="menu_stock_inventory_control" name="Inventory Control" parent="menu_stock_root" sequence="4"/>
+        <!--<menuitem id="menu_stock_inventory_control" name="Inventory Control" parent="menu_stock_root" sequence="4"/>-->
         <menuitem
             id="menu_product_in_config_stock" name="Products"
             parent="stock.menu_stock_configuration" sequence="45" groups="base.group_no_one"/>
@@ -70,7 +71,7 @@
                 </form>
             </field>
         </record>
-
+		
          <record id="view_inventory_filter" model="ir.ui.view">
             <field name="name">stock.inventory.filter</field>
             <field name="model">stock.inventory</field>
@@ -84,10 +85,9 @@
                         <filter string="Date" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
                     </group>
                 </search>
-
             </field>
         </record>
-
+		
         <record id="view_inventory_tree" model="ir.ui.view">
             <field name="name">stock.inventory.tree</field>
             <field name="model">stock.inventory</field>
@@ -191,7 +191,7 @@
                 </form>
             </field>
         </record>
-
+		
         <record id="action_inventory_form" model="ir.actions.act_window">
             <field name="name">Physical Inventories</field>
             <field name="type">ir.actions.act_window</field>
@@ -210,7 +210,7 @@
               </p>
             </field>
         </record>
-        <menuitem action="action_inventory_form" id="menu_action_inventory_form" parent="menu_stock_inventory_control" sequence="30"/>
+        <!--<menuitem action="action_inventory_form" id="menu_action_inventory_form" parent="menu_stock_inventory_control" sequence="30"/>-->
 
         <record id="action_inventory_form_draft" model="ir.actions.act_window">
             <field name="name">Draft Physical Inventories</field>
@@ -271,12 +271,15 @@
               </p>
             </field>
         </record>
-        <menuitem id="menu_traceability" name="Traceability" parent="menu_stock_root" 
-            sequence="3"/>
-        <menuitem action="action_tracking_form" id="menu_action_tracking_form"
+        
+<!--
+        <menuitem id="menu_traceability" name="Traceability" parent="menu_stock_root" sequence="3"/>
+-->
+        <menuitem id="menu_traceability" name="Stock View" parent="menu_stock_root" sequence="3"/>
+       <!-- <menuitem action="action_tracking_form" id="menu_action_tracking_form"
             groups="product.group_stock_packaging"
             sequence="6"
-            parent="menu_traceability"/>
+            parent="menu_traceability"/>-->
 
         <record id="lot_line_tree" model="ir.ui.view">
             <field name="name">stock.tracking.tree</field>
@@ -336,7 +339,8 @@
             <field name="name">stock.production.lot.form</field>
             <field name="model">stock.production.lot</field>
             <field name="arch" type="xml">
-                <form string="Serial Number" version="7.0">
+                <form string="Serial Number" version="7.0" create="false" delete="false">
+<!--
                     <div class="oe_button_box oe_right">
                         <button name="action_traceability" string="Upstream Traceability" type="object" context="{'type': 'move_history_ids2', 'field': 'prodlot_id'}"/>
                         <button name="action_traceability" string="Downstream Traceability" type="object" context="{'type': 'move_history_ids', 'field': 'prodlot_id'}"/>
@@ -347,22 +351,29 @@
                             <field name="name"/>
                         </h1>
                     </div>
+-->
                     <group>
                         <group>
-                            <field name="product_id"/>
-                            <field name="prefix"/>
-                            <field name="ref"/>
+                            <field name="product_id" readonly="1"/>
+                            <field name="name" readonly="1"/>
+                            <field name="prefix" invisible="1"/>
+                            <field name="ref" invisible="1"/>
                         </group>
                         <group>
-                            <field name="date"/>
+                            <field name="date" readonly="1"/>
+                            <field name="location_code" invisible="1"/>
+<!--
                             <field name="stock_available"/>
+-->
                         </group>
                     </group>
                     <notebook>
+<!--
                         <page string="Revisions">
                             <field name="revisions"/>
                         </page>
-                        <page string="Stock Moves">
+-->
+                        <page string="Stock Moves" invisible="1">
                             <field name="move_ids">
                                 <tree  string="Stock Moves">
                                     <field name="picking_id" string="Reference"/>
@@ -387,13 +398,15 @@
             <field name="name">stock.production.lot.tree</field>
             <field name="model">stock.production.lot</field>
             <field name="arch" type="xml">
-                <tree string="Serial Number">
-                    <field name="prefix"/>
-                    <field name="name"/>
-                    <field name="ref"/>
-                    <field name="product_id"/>
-                    <field name="stock_available"/>
-                    <field name="date"/>
+                <tree string="Serial Number" create="false" delete="false">
+					<field name="product_id"/>
+                    <field name="prefix" invisible="1"/>
+                    <field name="name" invisible="1"/>
+                    <field name="ref" invisible="1"/>
+                    <field name="stock_available" invisible="1"/>
+<!--
+                    <field name="date" invisible="1"/>
+-->
                 </tree>
             </field>
         </record>
@@ -404,24 +417,39 @@
             <field name="arch" type="xml">
                 <search string="Product Lots Filter">
                     <field name="name" string="Product Lots" filter_domain="['|','|',('name','ilike',self),('prefix','ilike',self),('ref','ilike',self)]"/>
+                    <field name="product_id" string="Product" filter_domain="[('product_id','ilike',self)]"/>
                     <field name="date"/>
+                    <filter icon="terp-check" name="available" string="Available" domain="[('stock_available', '&gt;', 0)]" help="Available Product Lots"/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Product" name="group_product_id" icon="terp-personal" domain="[]" context="{'group_by':'product_id'}"/>
+                        <filter string="Brand" name="group_brand_id" icon="terp-personal" domain="[]" context="{'group_by':'brand_id'}"/>
+                        <filter string="MOC" name="group_moc_id" icon="terp-personal" domain="[]" context="{'group_by':'moc_id'}"/>
+                    </group>
+                </search>
+<!--
+			 <search string="Product Lots Filter">
+                    <field name="name" string="Product Lots" filter_domain="['|','|',('name','ilike',self),('prefix','ilike',self),('ref','ilike',self)]"/>
                     <filter icon="terp-check" name="available" string="Available" domain="[('stock_available', '&gt;', 0)]" help="Available Product Lots"/>
                     <field name="product_id"/>
                     <group expand="0" string="Group By...">
                         <filter string="Product" icon="terp-accessories-archiver" domain="[]" context="{'group_by':'product_id'}"/>
                     </group>
                 </search>
+-->
             </field>
         </record>
 
         <record id="action_production_lot_form" model="ir.actions.act_window">
-            <field name="name">Serial Number</field>
+<!--    <field name="name">Serial Number</field>-->
+            <field name="name">Stock List - IPD</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">stock.production.lot</field>
             <field name="view_type">form</field>
-            <field name="view_id" ref="view_production_lot_tree"/>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('pending_qty','>',0),('location_code','=','GEN_Main')]</field>
+            <field name="context">{'search_default_group_product_id':1,'default_location_code':'GEN_Main'}</field>
             <field name="search_view_id" ref="search_product_lot_filter"/>
-            <field name="context">{}</field>
+            <field name="view_id" ref="view_production_lot_tree"/>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to add a serial number.
@@ -438,7 +466,7 @@
         </record>
         <menuitem action="action_production_lot_form" id="menu_action_production_lot_form"
             parent="menu_traceability" groups="stock.group_production_lot"
-            sequence="1"/>
+            sequence="3"/>
 
         #
         # Lot composition (history)
@@ -520,49 +548,93 @@
             <field name="name">Upstream traceability</field>
             <field eval="'ir.actions.act_window,'+str(action5)" name="value"/>
         </record>
-
+		
         <record id="view_location_form" model="ir.ui.view">
             <field name="name">stock.location.form</field>
             <field name="model">stock.location</field>
             <field name="arch" type="xml">
                 <form string="Stock Location" version="7.0">
-                    <label for="name" class="oe_edit_only"/>
-                    <h1><field name="name"/></h1>
-                    <label for="location_id" class="oe_edit_only"/>
-                    <h2><field name="location_id"/></h2>
+				  <header> 
+					<button name="entry_validate" type="object" string="Validate" states="draft" class="oe_highlight" confirm="Are you sure to proceed ?"/>
+					<button name="entry_reject" type="object" string="Reject" states="validated" class="oe_highlight" confirm="Are you sure to proceed ?"/>
+					<button name="entry_revert" type="object" string="Revert" states="validated" class="oe_highlight" confirm="Are you sure to proceed ?"/>
+				  </header>	
+				  <group>
                     <group>
-                        <group string="Additional Information">
-                            <field name="usage"/>
-                            <field name="partner_id"/>
-                            <field name="company_id" groups="base.group_multi_company" widget="selection"/>
-                            <field name="icon"/>
-                            <field name="scrap_location"/>
-                            <field name="active"/>
+						<field name="name"  class='aplhanum_expect' attrs="{'readonly': [('state','not in',['draft'])]}"/>
+						<field name="usage" string="Usage Type" attrs="{'readonly': [('state','=', 'validated')]}"/>
+						<field name="is_parent" attrs="{'readonly': [('state','=', 'validated')]}"/>
+						<field name="notes" attrs="{'readonly': [('state','in',['validated','rejected'])]}"/>
+						<field name="scrap_location" attrs="{'readonly': [('state','=', 'validated')]}" invisible="1"/>
+						<field name="custom" invisible="1"/>
+						<field name="remark" attrs="{'invisible':[('state','=','draft')], 'readonly': [('state','in',['rejected'])]}"/>
+                    </group>
+                    <group>
+						<field name="code" readonly="1"/>
+						<field name="location_id" attrs="{'readonly': [('state','=', 'validated')],'invisible':[('is_parent','=',True)]}"/>
+						<field name="location_type" string="Location Category" attrs="{'readonly': [('state','=', 'validated')]}"/>
+						<field name="state" style="width: 30%%" class="att_state_change"/>
+                    </group>
+                  </group>
+                  
+                  <group>
+                        <group>
+                            <field name="partner_id" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company" widget="selection" invisible="1"/>
+                            <field name="icon" invisible="1"/>
                         </group>
-                        <group string="Chained Locations">
-                            <field name="chained_location_type"/>
-                            <field name="chained_location_id"  attrs="{'required':[('chained_location_type','=','fixed')],'invisible':[('chained_location_type','in',['none','customer'])]}"/>
-                            <field name="chained_auto_packing"/>
-                            <field name="chained_delay"/>
-                            <field name="chained_journal_id"/>
-                            <field name="chained_picking_type"/>
-                            <field name="chained_company_id" widget="selection"/>
+                        <group string="Chained Locations" invisible="1">
+                            <field name="chained_location_type" invisible="1"/>
+                            <field name="chained_location_id"  invisible="1" attrs="{'required':[('chained_location_type','=','fixed')],'invisible':[('chained_location_type','in',['none','customer'])]}"/>
+                            <field name="chained_auto_packing" invisible="1"/>
+                            <field name="chained_delay" invisible="1"/>
+                            <field name="chained_journal_id" invisible="1"/>
+                            <field name="chained_picking_type" invisible="1"/>
+                            <field name="chained_company_id" widget="selection" invisible="1"/>
                         </group>
-                        <group string="Localization">
-                            <field name="posx"/>
-                            <field name="posy"/>
-                            <field name="posz"/>
-                        </group><group string="Accounting Information" attrs="{'invisible':[('usage','not in',('inventory','production'))]}">
-                            <field name="valuation_in_account_id"/>
-                            <field name="valuation_out_account_id"/>
+                        <group string="Localization" invisible="1">
+                            <field name="posx" invisible="1"/>
+                            <field name="posy" invisible="1"/>
+                            <field name="posz" invisible="1"/>
+                        </group>
+                        <group string="Accounting Information" invisible="1" attrs="{'invisible':[('usage','not in',('inventory','production'))]}">
+                            <field name="valuation_in_account_id" invisible="1"/>
+                            <field name="valuation_out_account_id" invisible="1"/>
                         </group>
                     </group>
-                    <separator string="Additional Information"/>
-                    <field name="comment"/>
+                    <notebook>
+						<page string="Log Info">
+							<group>
+								<group>
+									<field name="company_id" readonly="1"/>
+								</group>
+								<group>
+									<field name="active"/>
+								</group>
+								<group>
+									<field name="crt_user_id"/>
+									<field name="validated_user_id" attrs="{'invisible':[('state','in',['draft'])]}"/>
+									<field name="rejected_user_id" attrs="{'invisible':[('state','not in',['rejected'])]}"/>
+									<field name="updated_user_id"/>
+								</group>
+								<group>
+									<field name="crt_date"/>
+									<field name="validated_date" attrs="{'invisible':[('state','in',['draft'])]}"/>
+									<field name="rejected_date" attrs="{'invisible':[('state','not in',['rejected'])]}"/>
+									<field name="updated_date"/>
+									<field name="source_mode"/>
+								</group>
+							</group>
+						</page>
+                    <page string="Additional Information" invisible="1">
+                    <field name="comment" invisible="1"/>
+                    </page>
+                    </notebook>
+					<field name="notes" placeholder="Reference Notes" attrs="{'readonly': [('state','in',['rejected'])]}"/>
                 </form>
             </field>
         </record>
-
+		
         <record id="view_location_search" model="ir.ui.view">
             <field name="name">stock.location.search</field>
             <field name="model">stock.location</field>
@@ -573,33 +645,44 @@
                     <filter icon="terp-personal" name="customer" string="Customer" domain="[('usage', '=', 'customer')]" help="Customer Locations"/>
                     <filter icon="terp-personal" name="supplier" string="Supplier" domain="[('usage', '=', 'supplier')]" help="Supplier Locations"/>
                     <field name="location_id" string="Parent Location"/>
+                    <separator/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Location Name" icon="terp-personal" domain="[]" context="{'group_by':'name'}"/> 
+                        <filter string="Status" icon="terp-gtk-select-all" domain="[]" context="{'group_by':'state'}"/>
+					</group>
                 </search>
             </field>
         </record>
-
-
+		
         <record id="view_location_tree2" model="ir.ui.view">
             <field name="name">stock.location.tree</field>
             <field name="model">stock.location</field>
             <field name="priority" eval="2"/>
             <field name="arch" type="xml">
-                <tree string="Stock Location" colors="blue:usage=='view';darkred:usage=='internal'">
-                    <field name="complete_name"/>
-                    <field name="usage"/>
+				 <tree colors="blue:state == 'draft';black:state == 'validated';gray:state == 'rejected'" toolbar="True" string="Location">
+                    <field name="complete_name" invisible="1"/>
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="usage" string="Usage Type"/>
+                    <field name="location_type"/>
+                    <field name="state"/>
+                    <field name="custom" invisible="1"/>
                     <field name="stock_real" invisible="'product_id' not in context"/>
                     <field name="stock_virtual" invisible="'product_id' not in context"/>
                 </tree>
             </field>
         </record>
-
+		
         <record id="action_location_form" model="ir.actions.act_window">
-            <field name="name">Locations</field>
+            <field name="name">Stock Locations</field>
             <field name="res_model">stock.location</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_type">form</field>
             <field name="view_id" ref="view_location_tree2"/>
             <field name="search_view_id" ref="view_location_search"/>
-            <field name="context">{'search_default_in_location':1}</field>
+            <field name="context">{'default_custom': True}</field>
+			<field name="domain">[('custom','=',True)]</field>
+<!--        <field name="context">{'search_default_in_location':1}</field> -->
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 Click to add a location.
@@ -619,9 +702,17 @@
               </p>
             </field>
         </record>
+        
+        <!-- Menu item -->
         <menuitem action="action_location_form" id="menu_action_location_form" groups="stock.group_locations"
             parent="menu_stock_configuration" sequence="5"/>
-
+		
+		<!-- Menu Name Start here --> 
+		
+			<menuitem action="action_location_form" name="Stock Location" id="mam_m_stock_location" parent="parent_menus.mrm_po_inv_masters" sequence="1"/>
+		
+		<!-- Menu Name End here --> 
+		
         <record id="view_location_tree" model="ir.ui.view">
             <field name="name">stock.location.tree</field>
             <field name="model">stock.location</field>
@@ -632,6 +723,7 @@
                 </tree>
             </field>
         </record>
+        
         <record id="action_location_tree" model="ir.actions.act_window">
             <field name="name">Location Structure</field>
             <field name="res_model">stock.location</field>
@@ -650,11 +742,13 @@
               </p>
             </field>
         </record>
-        <menuitem action="action_location_tree"
+        
+       
+      <!--  <menuitem action="action_location_tree"
             id="menu_action_location_tree"
             parent="menu_stock_inventory_control"
             groups="stock.group_locations"
-            sequence="20"/>
+            sequence="20"/>-->
 
         <record id="view_warehouse" model="ir.ui.view">
             <field name="name">stock.warehouse</field>
@@ -984,7 +1078,7 @@
             <field name="view_id" ref="stock_picking_out_calendar"/>
             <field name="act_window_id" ref="action_picking_tree"/>
         </record>
-        <menuitem action="action_picking_tree" id="menu_action_picking_tree" parent="menu_stock_warehouse_mgmt" sequence="3"/>
+       <!-- <menuitem action="action_picking_tree" id="menu_action_picking_tree" parent="menu_stock_warehouse_mgmt" sequence="3"/>-->
 
         <!-- Incomming Shipments -->
         <record model="ir.ui.view" id="stock_picking_in_calendar">
@@ -1112,9 +1206,9 @@
             <field name="view_id" ref="stock_picking_in_calendar"/>
             <field name="act_window_id" ref="action_picking_tree4"/>
         </record>
-        <menuitem action="action_picking_tree4" id="menu_action_picking_tree4" parent="menu_stock_warehouse_mgmt" sequence="1"/>
+      <!--  <menuitem action="action_picking_tree4" id="menu_action_picking_tree4" parent="menu_stock_warehouse_mgmt" sequence="1"/>
 
-        <menuitem action="action_picking_tree6" id="menu_action_picking_tree6" parent="menu_stock_warehouse_mgmt" sequence="2" groups="stock.group_locations"/>
+        <menuitem action="action_picking_tree6" id="menu_action_picking_tree6" parent="menu_stock_warehouse_mgmt" sequence="2" groups="stock.group_locations"/>-->
 
         <record id="view_move_tree" model="ir.ui.view">
             <field name="name">stock.move.tree</field>
@@ -1422,7 +1516,7 @@
         <field name="act_window_id" ref="action_move_form2"/>
         </record>
 
-        <menuitem action="action_move_form2" id="menu_action_move_form2" parent="menu_traceability" sequence="3" groups="stock.group_locations"/>
+        <!--<menuitem action="action_move_form2" id="menu_action_move_form2" parent="menu_traceability" sequence="3" groups="stock.group_locations"/>-->
 
         <!--
             Reception Picking (By Stock Move)
@@ -1662,8 +1756,8 @@
             <field name="act_window_id" ref="action_out_picking_move"/>
         </record>
 
-      <menuitem action="action_reception_picking_move" id="menu_action_pdct_in" parent="menu_stock_products_moves" sequence="1"/>
-      <menuitem action="action_out_picking_move" id="menu_action_pdct_out" parent="menu_stock_products_moves" sequence="2"/>
+      <!--<menuitem action="action_reception_picking_move" id="menu_action_pdct_in" parent="menu_stock_products_moves" sequence="1"/>
+      <menuitem action="action_out_picking_move" id="menu_action_pdct_out" parent="menu_stock_products_moves" sequence="2"/>-->
 
 
          <record id="view_stock_journal_filter" model="ir.ui.view">

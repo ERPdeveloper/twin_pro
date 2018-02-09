@@ -59,7 +59,6 @@
                     <field name="lst_price" invisible="1"/>
                     <field name="price" invisible="1"/>
                     <field name="standard_price" invisible="1"/>
-                    <field name="rate_type" invisible="1"/>
                     <field name="company_id" groups="base.group_multi_company" invisible="1"/>
                 </tree>
             </field>
@@ -89,7 +88,6 @@
 							<field name="qa_status" invisible ="1"/>
 							<field name="reorder_status" invisible ="1"/>
 							<field name="sale_ok" invisible ="1"/>
-							<field name="rate_type" invisible ="1"/>
 						</group>
 					</group>
 					<notebook>
@@ -143,7 +141,7 @@
 							</group>
 						</page>
 						
-						<page string="Entry Info">
+						<page string="Log Info">
 							<group>
 								<group>
 									<field name="company_id"/>
@@ -240,7 +238,7 @@
         </record>
 
         <!-- Product Kanban View  -->
-
+		
         <record model="ir.ui.view" id="product.product_kanban_view">
             <field name="name">Product Kanban</field>
             <field name="model">product.product</field>
@@ -271,14 +269,14 @@
                 </kanban>
             </field>
         </record>
-
+		
         <record id="product_normal_action" model="ir.actions.act_window">
             <field name="name">Products</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">product.product</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="context">{'default_product_type': 'consu','default_rate_type': 'purchase_item',}</field>
+            <field name="context">{'default_product_type': 'consu',}</field>
 			<field name="domain">[('product_type','in',('raw','consu','capital','service')),]</field>
             <field name="view_id" ref="product_product_tree_view"/>
             <field name="search_view_id" ref="product_search_form_view"/>
@@ -314,21 +312,21 @@
               </p>
             </field>
         </record>
-
+		
         <record id="open_view_product_tree1" model="ir.actions.act_window.view">
             <field name="sequence" eval="2"/>
             <field name="view_mode">tree</field>
             <field name="view_id" ref="product_product_tree_view"/>
             <field name="act_window_id" ref="product_normal_action_sell"/>
         </record>
-
+		
         <record id="open_view_product_form1" model="ir.actions.act_window.view">
             <field name="sequence" eval="3"/>
             <field name="view_mode">form</field>
             <field name="view_id" ref="product_normal_form_view"/>
             <field name="act_window_id" ref="product_normal_action_sell"/>
         </record>
-
+		
         <record id="open_view_product_kanban1" model="ir.actions.act_window.view">
             <field name="sequence" eval="1"/>
             <field name="view_mode">kanban</field>
@@ -338,7 +336,7 @@
 
       <!--  <menuitem id="base.menu_product" name="Products" parent="base.menu_base_partner" sequence="9"/>
         <menuitem action="product.product_normal_action_sell" id="product.menu_products" parent="base.menu_product" sequence="1"/> -->
-
+		
         <record id="product_normal_action_puchased" model="ir.actions.act_window">
             <field name="name">Products</field>
             <field name="type">ir.actions.act_window</field>
@@ -362,17 +360,18 @@
               </p>
             </field>
         </record>
-
+		
+		<!--Product Category Starts -->
+		
         <record id="product_category_search_view" model="ir.ui.view">
             <field name="name">product.category.search</field>
             <field name="model">product.category</field>
             <field name="arch" type="xml">
-                <search string="Product Categories">
+                <search string="Categories">
 					<field name="name" string="Name" filter_domain="[('name','ilike',self)]"/>
 					<filter icon="terp-check" name="draft" string="Draft" domain="[('state','=','draft')]"/>
-					<filter icon="terp-check" name="confirmed" string="Confirmed" domain="[('state','=','confirm')]"/>
-					<filter icon="terp-check" name="approve" string="Approved" domain="[('state','=','approved')]"/>
-					<filter icon="terp-check" name="reject" string="Rejected" domain="[('state','=','reject')]"/>	
+					<filter icon="terp-check" name="validated" string="Validated" domain="[('state','=','validated')]"/>
+					<filter icon="terp-check" name="rejected" string="Rejected" domain="[('state','=','rejected')]"/>	
 
                    <group  expand='0' string='Group by...'>
                        <filter string='Status' icon="terp-stock_symbol-selection" domain="[]" context="{'group_by' : 'state'}"/>
@@ -387,41 +386,29 @@
             <field name="arch" type="xml">
                 <form string="Product Categories" version="7.0">
 					<header>
-						<!--<button name="entry_reject" type="object" string="Reject" states="confirm" class="oe_highlight" confirm="Are you sure to proceed ?"/>-->
-						<button name="entry_confirm" states="draft" string="Confirm" type="object" class="oe_highlight"/>
-						<button name="entry_reject" type="object" string="Reject" states="confirm" class="oe_highlight" confirm="Are you sure to proceed ?" />
-						<button name="entry_approve" states="confirm" string="Approve" type="object" class="oe_highlight" confirm="Are you sure to proceed ?"/>
-						<button name="entry_cancel" type="object" states="approved,reject" string="Cancel" class="oe_highlight" confirm="Are you sure to proceed ?" invisible="1"/>
-						<button name="entry_draft" type="object" states="approved" string="Set To Draft" class="oe_highlight"/>
+						<button name="entry_validate" type="object" string="Validate" states="draft" class="oe_highlight" confirm="Are you sure to proceed ?"/>
+						<button name="entry_reject" type="object" string="Reject" states="validated" class="oe_highlight" confirm="Are you sure to proceed ?"/>
+						<button name="entry_revert" type="object" string="Revert" states="validated" class="oe_highlight" confirm="Are you sure to proceed ?"/>
 					</header>
 					<group>
 						<group>
-							<field name="name" placeholder="Name" attrs="{'readonly': [('state','=','approved')]}" />
+							<field name="name"  class='aplhanum_expect' attrs="{'readonly': [('state','not in',['draft'])]}"/>
+							<field name="remark" attrs="{'invisible':[('state','=','draft')], 'readonly': [('state','in',['rejected'])]}"/>
 							<field name="parent_id" attrs="{'readonly': [('state','=','approved')],'invisible': [('flag_isparent','=',True)]}"/>							
 						</group>
 						<group>
-							<field name="flag_isparent" attrs="{'readonly': [('state','=','approved')]}" />
+							<field name="code"  class='aplhanum_expect' attrs="{'readonly': [('state','not in',['draft'])]}"/>
+							<field name="flag_isparent" attrs="{'readonly': [('state','=','validated')]}" />
 							<field name="state" style="width: 30%%" class="att_state_change"/>
 						</group>
-						<group>
-							<field name="notes"  attrs="{'readonly': [('state','in',['approved','reject','cancel'])]}"/>
-						</group>
 					</group> 
-					<group string='Remarks' attrs="{'invisible':[('state','=','draft')]}">
-						<group>	
-							<field name="remark" attrs="{'invisible':[('state','in',['draft','approved','cancel'])],'readonly': [('state','=','approved')]}"/>
-						</group>
-						<group>												
-							<field name="cancel_remark" invisible="1"/>												
-						</group>
-					</group>
 					<group>
 						<group name="parent" col="4">
 							<field name="type" attrs="{'readonly': [('state','=','approved')]}" invisible="1"/>
 						</group>
 					</group>
 					<notebook>
-						<page string="Entry Info">
+						<page string="Log Info">
 							<group>
 								<group>
 									<field name="company_id"/>
@@ -430,60 +417,35 @@
 									<field name="active"/>
 								</group>
 								<group>
-									<field name="user_id"/>
-									<field name="conf_user_id" attrs="{'invisible':[('state','in',['draft'])]}"/>
-									<field name="app_user_id" attrs="{'invisible':[('state','in',['draft','reject','confirm'])]}"/>
-									<field name="cancel_user_id" attrs="{'invisible':[('state','in',['draft', 'confirm','reject','approved'])]}"/>
-									<field name="rej_user_id" attrs="{'invisible':[('state','in',['draft', 'confirm','approved','cancel'])]}"/>
-									<field name="update_user_id"/>
+									<field name="crt_user_id"/>
+									<field name="validated_user_id" attrs="{'invisible':[('state','in',['draft'])]}"/>
+									<field name="rejected_user_id" attrs="{'invisible':[('state','not in',['rejected'])]}"/>
+									<field name="updated_user_id"/>
 								</group>
 								<group>
-									<field name="creation_date"/>
-									<field name="confirm_date" attrs="{'invisible':[('state','in',['draft'])]}"/>
-									<field name="approve_date" attrs="{'invisible':[('state','in',['draft','reject','confirm'])]}"/>
-									<field name="cancel_date" attrs="{'invisible':[('state','in',['draft', 'confirm','reject','approved'])]}"/>
-									<field name="reject_date" attrs="{'invisible':[('state','in',['draft', 'confirm','approved','cancel'])]}"/>
-									<field name="update_date"/>
+									<field name="crt_date"/>
+									<field name="validated_date" attrs="{'invisible':[('state','in',['draft'])]}"/>
+									<field name="rejected_date" attrs="{'invisible':[('state','not in',['rejected'])]}"/>
+									<field name="updated_date"/>
+									<field name="source_mode"/>
 								</group>
 							</group>
 						</page>
 					</notebook>
+					<field name="notes" placeholder="Reference Notes" attrs="{'readonly': [('state','in',['rejected'])]}"/>
                 </form>
             </field>
         </record>
-        
-<!--
-        <record id="product_category_search_form_view" model="ir.ui.view">
-            <field name="name">product.category.form</field>
-            <field name="model">product.category</field>
-            <field name="arch" type="xml">
-                <search string="Product Category">
-                   <field name="name" string="Product" filter_domain="['|',('name','ilike',self),('default_code','ilike',self)]"/>
-                   <filter icon="terp-check" name="draft" string="Draft" domain="[('state','=','draft')]"/>
-				   <filter icon="terp-check" name="confirmed" string="Confirmed" domain="[('state','=','confirm')]"/>
-				   <filter icon="terp-check" name="approve" string="Approved" domain="[('state','=','approved')]"/>
-				   <filter icon="terp-check" name="reject" string="Rejected" domain="[('state','=','reject')]"/>	
-
-                   <group  expand='0' string='Group by...'>
-                       <filter string='Status' icon="terp-stock_symbol-selection" domain="[]" context="{'group_by' : 'state'}"/>
-                   </group>
-                </search>
-            </field>
-        </record>
--->
-        
+          
         <record id="product_category_list_view" model="ir.ui.view">
             <field name="name">product.category.list</field>
             <field name="model">product.category</field>
             <field name="priority">1</field>
             <field name="arch" type="xml">
-<!--
-                <tree string="Product Categories">
--->
-				<tree colors="blue:state == 'draft';red:state == 'confirm'
-						;black:state == 'approved';gray:state == 'reject';gray:state == 'cancel'" string="Product Categories">
+				<tree colors="blue:state == 'draft';black:state == 'validated';gray:state == 'rejected'" toolbar="True" string="Product Category">
 					<field name="category_code" invisible="1"/>
                     <field name="complete_name"/>
+                    <field name="code"/>
                     <field name="state"/>
                 </tree>
             </field>
@@ -493,8 +455,10 @@
             <field name="model">product.category</field>
             <field name="field_parent">child_id</field>
             <field name="arch" type="xml">
-                <tree toolbar="True" string="Product Categories">
+                <tree colors="blue:state == 'draft';black:state == 'validated';gray:state == 'rejected'" toolbar="True" string="Product Category">
                     <field name="name"/>
+                    <field name="code"/>
+                    <field name="state"/>
                 </tree>
             </field>
         </record>
@@ -531,8 +495,7 @@
             groups="base.group_no_one"
             id="menu_product_category_action_form"
             parent="prod_config_main" sequence="2"/>-->
-
-
+		
         <record id="product_normal_action_tree" model="ir.actions.act_window">
             <field name="name">Products</field>
             <field name="type">ir.actions.act_window</field>
@@ -547,101 +510,70 @@
             <field name="name">Products by Categories</field>
             <field eval="'ir.actions.act_window,%d'%product_normal_action_tree" name="value"/>
         </record>
-
+		
         <!-- Unit of Measure -->
-
+		
         <record id="product_uom_tree_view" model="ir.ui.view">
             <field name="name">product.uom.tree</field>
             <field name="model">product.uom</field>
             <field name="arch" type="xml">
-				<tree colors="blue:dummy_state == 'draft';red:dummy_state == 'confirm'
-						;black:dummy_state == 'approved';gray:dummy_state == 'reject';gray:dummy_state == 'cancel'" string="Units of Measure">
+				<tree colors="blue:dummy_state == 'draft';black:dummy_state == 'validated';gray:dummy_state == 'rejected'" toolbar="True" string="UOM Master">
                     <field name="name"/>
+                    <field name="code"/>
                     <field name="category_id" invisible='1'/>
                     <field name="dummy_state"/>
                 </tree>
             </field>
         </record>
-
+		
         <record id="product_uom_form_view" model="ir.ui.view">
             <field name="name">product.uom.form</field>
             <field name="model">product.uom</field>
             <field name="arch" type="xml">
                 <form string="Units of Measure" version="7.0">
 					<header>
-						<button name="entry_reject" type="object" string="Reject" class="oe_highlight" confirm="Are you sure to proceed ?" attrs="{'invisible':[('dummy_state','!=','confirm')]}" />
-						<button name="entry_confirm" string="Confirm" type="object" class="oe_highlight" attrs="{'invisible':[('dummy_state','!=','draft')]}"/>
-						<button name="entry_approve" string="Approve" type="object" class="oe_highlight" confirm="Are you sure to proceed ?" attrs="{'invisible':[('dummy_state','!=','confirm')]}" />
-						<button name="entry_cancel" type="object" string="Cancel" attrs="{'invisible':[('modify','=','yes')]}" class="oe_highlight" confirm="Are you sure to proceed ?" invisible="1"/>
-<!--					<button name="entry_cancel" type="object" attrs="{'invisible':[('dummy_state','!=','cancel')]}" string="Cancel" class="oe_highlight" confirm="Are you sure to proceed ?" invisible="1"/>-->
-						<button name="entry_draft" type="object"  attrs="{'invisible':['|',('entry_mode','=','auto'),('dummy_state','!=','approved')]}" string="Set To Draft" class="oe_highlight" confirm="Are you sure to proceed ?"/>
+						<button name="entry_validate" type="object" string="Validate" class="oe_highlight" confirm="Are you sure to proceed ?" attrs="{'invisible':[('dummy_state','!=','draft')]}"/>
+						<button name="entry_reject" type="object" string="Reject" class="oe_highlight" confirm="Are you sure to proceed ?" attrs="{'invisible':[('dummy_state','!=','validated')]}"/>
+						<button name="entry_revert" type="object" string="Revert" class="oe_highlight" confirm="Are you sure to proceed ?" attrs="{'invisible':[('dummy_state','!=','validated')]}"/>
 					</header>
-                    <group>
+					<group>
                         <group>
-                            <field name="name" attrs="{'readonly':[('dummy_state','=','approved')]}"/>
-                            <field name="uom_category" attrs="{'readonly':[('dummy_state','=','approved')]}"/>
+                            <field name="name" attrs="{'readonly':[('dummy_state','=','validated')]}"/>
+							<field name="remark" attrs="{'invisible':[('dummy_state','=','draft')], 'readonly': [('dummy_state','in',['rejected'])]}"/>
                             <field name="category_id" invisible="1"/>
-                            <field name="modify" invisible="1"/>
                             <field name="rounding" invisible="1"/>
-                            
-<!--                        <label for="factor"/>
-                            <div>-->
-<!--                            <field name="factor" attrs="{'invisible':[('uom_type','!=','smaller')]}" />-->
-<!--
-								<field name="factor" invisible="1"/>
-                                <field name="factor_inv" attrs="{'invisible':[('uom_type','!=','bigger')]}"/>
-                                <p attrs="{'invisible':[('uom_type','!=','smaller')]}" class="oe_grey">
-                                    e.g: 1 * (reference unit) = ratio * (this unit)
-                                </p>
-                                <p attrs="{'invisible':[('uom_type','!=','bigger')]}" class="oe_grey">
-                                    e.g: 1 * (this unit) = ratio * (reference unit)
-                                </p>
-                            </div>-->
                         </group>
                         <group>
 							<field name="uom_type" on_change="onchange_type(uom_type)" readonly="1" invisible='1'/>
 							<field name="dummy_state" style="width: 30%%" class="att_state_change"/>
                         </group>
-                        <group>
-							<field name="notes" attrs ="{'readonly': [('dummy_state','in',['approved','reject','cancel'])]}"/>
-                        </group>
-                   </group>                       
-                        <group string='Remarks' attrs="{'invisible':[('dummy_state','=','draft')]}">
-							<group>	
-								<field name="remark" attrs="{'invisible':[('dummy_state','not in',('confirm','reject'))], 'readonly': [('dummy_state','in',['approved','reject','cancel'])]}"/>
-							</group>
-							<group>												
-								<field name="cancel_remark" attrs="{'invisible':[('dummy_state','not in',['approved','cancel'])], 'readonly': [('dummy_state','in',['cancel'])]}"/>												
-							</group>
-						</group>
-                        <notebook>
-							<page string="Entry Info">
+					</group>
+					<notebook>
+						<page string="Log Info">
+							<group>
 								<group>
-									<group>
-										<field name="company_id"/>
-									</group>
-									<group>
-										<field name="active"/>
-									</group>
-									<group>
-										<field name="user_id"/>
-										<field name="confirm_user_id" attrs="{'invisible':[('dummy_state','in',['draft'])]}"/>
-										<field name="cancel_user_id" attrs="{'invisible':[('dummy_state','in',['draft', 'confirm','reject','approved'])]}"/>
-										<field name="ap_rej_user_id" attrs="{'invisible':[('dummy_state','in',['draft', 'confirm'])]}"/>										
-										<field name="update_user_id"/>
-									</group>
-									<group>
-										<field name="crt_date"/>
-										<field name="confirm_date" attrs="{'invisible':[('dummy_state','in',['draft'])]}"/>
-										<field name="cancel_date" attrs="{'invisible':[('dummy_state','in',['draft', 'confirm','reject','approved'])]}"/>
-										<field name="ap_rej_date" attrs="{'invisible':[('dummy_state','in',['draft', 'confirm'])]}"/>										
-										<field name="update_date"/>
-										<field name="entry_mode"/>
-									</group>
+									<field name="company_id"/>
 								</group>
-							</page>
-						</notebook>		
-                    
+								<group>
+									<field name="active"/>
+								</group>
+								<group>
+									<field name="crt_user_id"/>
+									<field name="validated_user_id" attrs="{'invisible':[('dummy_state','in',['draft'])]}"/>
+									<field name="rejected_user_id" attrs="{'invisible':[('dummy_state','not in',['rejected'])]}"/>
+									<field name="updated_user_id"/>
+								</group>
+								<group>
+									<field name="crt_date"/>
+									<field name="validated_date" attrs="{'invisible':[('dummy_state','in',['draft'])]}"/>
+									<field name="rejected_date" attrs="{'invisible':[('dummy_state','not in',['rejected'])]}"/>
+									<field name="updated_date"/>
+									<field name="source_mode"/>
+								</group>
+							</group>
+						</page>
+					</notebook>
+                    <field name="notes" placeholder="Reference Notes" attrs="{'readonly': [('dummy_state','in',['rejected'])]}"/>
                 </form>
             </field>
         </record>
@@ -653,9 +585,8 @@
                 <search string="UOM">
                    <field name="name" string="Name" filter_domain="[('name','ilike',self)]"/>
                    <filter icon="terp-check" name="draft" string="Draft" domain="[('dummy_state','=','draft')]"/>
-				   <filter icon="terp-check" name="confirmed" string="Confirmed" domain="[('dummy_state','=','confirm')]"/>
-				   <filter icon="terp-check" name="approve" string="Approved" domain="[('dummy_state','=','approved')]"/>
-				   <filter icon="terp-check" name="reject" string="Rejected" domain="[('dummy_state','=','reject')]"/>	
+				   <filter icon="terp-check" name="validated" string="Validated" domain="[('dummy_state','=','validated')]"/>
+				   <filter icon="terp-check" name="rejected" string="Rejected" domain="[('dummy_state','=','rejected')]"/>	
                <group  expand='0' string='Group by...'>
                    <filter string='Status' icon="terp-stock_symbol-selection" domain="[]" context="{'group_by' : 'dummy_state'}"/>
                    </group>
@@ -765,7 +696,7 @@
                 </tree>
             </field>
         </record>
-
+		
         <record id="product_packaging_form_view" model="ir.ui.view">
             <field name="name">product.packaging.form.view</field>
             <field name="model">product.packaging</field>
@@ -794,7 +725,7 @@
                 </form>
             </field>
         </record>
-
+		
 <!--
         <record id="product_supplierinfo_form_view" model="ir.ui.view">
             <field name="name">product.supplierinfo.form.view</field>
@@ -846,7 +777,7 @@
                 </tree>
             </field>
         </record>
-
+		
         <record id="product_variant_form_view" model="ir.ui.view">
             <field name="name">product.variant.form</field>
             <field name="model">product.product</field>
@@ -865,7 +796,7 @@
                 </form>
             </field>
         </record>
-
+		
         <record id="product_variant_tree_view" model="ir.ui.view">
             <field name="name">product.variant.tree</field>
             <field name="model">product.product</field>
@@ -880,7 +811,7 @@
                 </tree>
             </field>
         </record>
-
+		
         <record id="product_template_tree_view" model="ir.ui.view">
             <field name="name">product.template.product.tree</field>
             <field name="model">product.template</field>
@@ -893,7 +824,7 @@
                 </tree>
             </field>
         </record>
-
+		
         <record id="product_template_form_view" model="ir.ui.view">
             <field name="name">product.template.product.form</field>
             <field name="model">product.template</field>
@@ -970,7 +901,7 @@
                 </form>
             </field>
         </record>
-
+		
         <record id="product_template_action_tree" model="ir.actions.act_window">
             <field name="name">Product Templates</field>
             <field name="type">ir.actions.act_window</field>
@@ -978,6 +909,6 @@
             <field name="view_type">form</field>
             <field name="view_id" ref="product_template_tree_view"/>
         </record>
-
+		
     </data>
 </openerp>

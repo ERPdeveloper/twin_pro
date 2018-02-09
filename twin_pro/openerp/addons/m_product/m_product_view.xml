@@ -12,9 +12,7 @@
 		
 		<field name="categ_id" position="after">
 			<field name="hsn_no" required="1"/>
-			<field name="is_accessories" invisible="1"/>
 			<field name="capital" invisible="1"/>
-			<field name="abc" invisible="1"/>
 		</field>
 				
 		<field name="tolerance_applicable" position="after">
@@ -44,7 +42,6 @@
 		<field name="stock_in_hand" position="after">
 		<field name="length" invisible="1"/>
 		<field name="breadth" invisible="1"/>
-		<field name="od" invisible="1"/>
 		<field name="thickness" invisible="1"/>
 		<field name="weight" invisible="1"/>
 		</field>
@@ -119,13 +116,13 @@
 	</record>	
 	
 	<!-- Product Master Purchase --> 
-	<menuitem action="product.product_normal_action" name="Product" id="mam_product_master" parent="parent_menus.mrm_po_inv_masters" sequence="10"/>
+	<menuitem action="product.product_normal_action" name="Product" id="mam_product_master" parent="parent_menus.mrm_po_inv_masters" sequence="1"/>
 	
 	<!-- Product Category Master -->
-	<menuitem action="product.product_category_action_form" name="Product Category" id="mam_product_catg_master" parent="parent_menus.mrm_po_inv_masters" sequence="11"/>
+	<menuitem action="product.product_category_action_form" name="Product Category" id="mam_product_catg_master" parent="parent_menus.mrm_po_inv_masters" sequence="1"/>
 	
 	<!-- Units of Measure Master  -->
-	<menuitem action="product.product_uom_form_action" name="Units of Measure" id="mam_uom_master" parent="parent_menus.mrm_po_inv_masters" sequence="12"/>
+	<menuitem action="product.product_uom_form_action" name="Units of Measure" id="mam_uom_master" parent="parent_menus.mrm_po_inv_masters" sequence="1"/>
 	
 	</data>
 </openerp>

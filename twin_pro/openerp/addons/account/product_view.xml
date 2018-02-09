@@ -51,7 +51,7 @@
             <field name="arch" type="xml">
                 <data>
                     <xpath expr="//group[@name='parent']" position="inside">
-                        <group name="account_property" string="Account Properties" colspan="2">
+                        <group name="account_property" string="Account Properties" colspan="2" invisible="1">
                             <field name="property_account_income_categ" domain="[('type','&lt;&gt;','view'),('type','&lt;&gt;','consolidation')]"/>
                             <field name="property_account_expense_categ" domain="[('type','&lt;&gt;','view'),('type','&lt;&gt;','consolidation')]"/>
                         </group>

@@ -100,7 +100,7 @@ class m_brand(osv.osv):
 	def unlink(self,cr,uid,ids,context=None):
 		unlink_ids = []
 		for rec in self.browse(cr,uid,ids):
-			if rec.state not in ('draft','cancel'):
+			if rec.state not in ('draft'):
 				raise osv.except_osv(_('Warning !'),_('Draft only can be deleted.'))
 			else:
 				unlink_ids.append(rec.id)

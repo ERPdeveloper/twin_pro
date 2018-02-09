@@ -24,13 +24,11 @@ class m_product(osv.osv):
 	_columns = {
 		
 		'capital': fields.boolean('Capital Goods'),
-		'abc': fields.boolean('ABC Analysis'),
 		'po_uom_coeff': fields.float('PO Coeff', digits=(16,10), required=True, help="One Purchase Unit of Measure = Value of(PO Coeff)UOM"),
 		'product_type': fields.selection([('raw','Raw Materials'),('consu','Consumables'),
 											('capital','Capitals and Asset'),('service','Service Items')],'Product Type',required=True,readonly=False,states={'validated':[('readonly',True)]}),
 		'remark': fields.text('Approve/Reject Remarks',readonly=False,states={'validated':[('readonly',True)]}),
 		'cancel_remark': fields.text('Cancel Remarks'),
-		'od': fields.float('OD'),
 		'breadth': fields.float('Breadth'),
 		'length': fields.float('Length'),
 		'thickness': fields.float('Thickness'),
@@ -38,26 +36,13 @@ class m_product(osv.osv):
 		'po_uom_in_kgs': fields.float('PO UOM in kgs',digits=(16,10),readonly=False,states={'validated':[('readonly',True)]}),
 		'uom_conversation_factor': fields.selection(UOM_CONVERSATION,'UOM Conversation Factor',required=True,readonly=False,states={'validated':[('readonly',True)]}),
 		'price_type': fields.selection([('po_uom','PO UOM'),('per_kg','Per Kg')],'Price Type'),
-		'service_factor': fields.float('Service Factor'),
-		'power_kw': fields.float('Power in KW'),
-		'speed_in_rpm': fields.float('Speed In RPM'),
-		'max_bore': fields.float('MAX Bore'),
-		'coupling_size': fields.float('Coupling Size'),
-		'spacer_length': fields.float('Spacer Length'),
-		'mechanical_type': fields.char('Type'),
-		'operating_condition': fields.char('Operating Condition'),
-		'face_combination': fields.char('Face Combination'),
-		'api_plan': fields.char('API Plan'),
-		'gland_placement': fields.char('Gland Placement'),
-		'gland_plate': fields.selection([('w_gland_plate','With Gland Plate'),('wo_gland_plate','Without Gland Plate')],'Gland Plate'),
-		'sleeve_dia': fields.char('Sleeve dia(MM)'),
 		'is_depreciation': fields.boolean('Is Depreciation'),
 		'hsn_no': fields.many2one('m.hsn.code','HSN No.',domain="[('state','=','validated')]"),
 		'uom_code': fields.related('uom_id','code', type='char', string='Store UOM Code'),
 		
 		## Child
 		
-		'avg_line_ids':fields.one2many('ch.product.yearly.average.price','product_id','Line Entry'),
+		
 		
 		# Entry Info
 		

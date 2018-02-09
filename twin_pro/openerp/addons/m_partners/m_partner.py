@@ -50,7 +50,6 @@ class m_partner(osv.osv):
 	'sector': fields.selection([('cp','CP'),('ip','IP'),('both','Both')],'Marketing Division'),
 	'dealer_id': fields.many2one('res.partner','Dealer Name',domain=[('dealer','=',True),('partner_state','=','validated')]),
 	'remark': fields.text('Rejected For'),
-	'cancel_remark': fields.text('Cancel Remarks'),
 	'user_ref_id': fields.many2one('res.users','User Name'),
 	'adhar_id': fields.char('Adhar ID',size=16),
 	'contractor': fields.boolean('Contractor'),
@@ -121,45 +120,45 @@ class m_partner(osv.osv):
 	
 	def entry_validate(self, cr, uid, ids, context=None): 
 		rec = self.browse(cr, uid, ids[0])
-		if rec.partner_state == 'confirm':
+		if rec.partner_state == 'draft':
 			## Account master creation process start
 			
-			internal_type = note = account_receivable_id = account_payable_id =  ''
-			entry_mode = 'auto'
-			account_payable_id = ''
-			ac_obj = self.pool.get('account.account')
-			old_acc_ids = ac_obj.search(cr,uid,[('master_id','=',rec.id)])
-			if old_acc_ids:
-				old_acc_rec = ac_obj.browse(cr,uid,old_acc_ids[0])
-				ac_obj.write(cr,uid,old_acc_rec.id,{'name': rec.name})
-			acc_ids = ac_obj.search(cr,uid,[('name','=',rec.name)])
-			ac_type = ''
-			if not acc_ids:
-				if rec.customer == True:
-					ac_type_ids = self.pool.get('account.account.type').search(cr,uid,[('name','=','Asset')])
-					if ac_type_ids:
-						ac_type_rec = self.pool.get('account.account.type').browse(cr,uid,ac_type_ids[0])
-						ac_type = ac_type_rec.id
-					internal_type = 'receivable'
-					note = 'New Customer Added'
-					account_receivable_id = ac_obj.account_creation(cr,uid,rec.name,ac_type,rec.id,entry_mode,internal_type,note,context=context)
-				if rec.supplier == True:
-					internal_type = 'payable'
-					note = 'New Supplier Added'
-				if rec.dealer == True:
-					internal_type = 'payable'
-					note = 'New Delear Added'
-				if rec.contractor == True:
-					internal_type = 'payable'
-					note = 'New Contractor Added'
-				if rec.supplier == True or rec.dealer == True or rec.contractor == True:
-					ac_type_ids = self.pool.get('account.account.type').search(cr,uid,[('name','=','Liability')])
-					if ac_type_ids:
-						ac_type_rec = self.pool.get('account.account.type').browse(cr,uid,ac_type_ids[0])
-						ac_type = ac_type_rec.id
-					account_payable_id = ac_obj.account_creation(cr,uid,rec.name,ac_type,rec.id,entry_mode,internal_type,note,context=context)
-				
-				self.write(cr, uid, ids, {'property_account_receivable':account_receivable_id,'property_account_payable':account_payable_id})
+			#~ internal_type = note = account_receivable_id = account_payable_id =  ''
+			#~ entry_mode = 'auto'
+			#~ account_payable_id = ''
+			#~ ac_obj = self.pool.get('account.account')
+			#~ old_acc_ids = ac_obj.search(cr,uid,[('master_id','=',rec.id)])
+			#~ if old_acc_ids:
+				#~ old_acc_rec = ac_obj.browse(cr,uid,old_acc_ids[0])
+				#~ ac_obj.write(cr,uid,old_acc_rec.id,{'name': rec.name})
+			#~ acc_ids = ac_obj.search(cr,uid,[('name','=',rec.name)])
+			#~ ac_type = ''
+			#~ if not acc_ids:
+				#~ if rec.customer == True:
+					#~ ac_type_ids = self.pool.get('account.account.type').search(cr,uid,[('name','=','Asset')])
+					#~ if ac_type_ids:
+						#~ ac_type_rec = self.pool.get('account.account.type').browse(cr,uid,ac_type_ids[0])
+						#~ ac_type = ac_type_rec.id
+					#~ internal_type = 'receivable'
+					#~ note = 'New Customer Added'
+					#~ account_receivable_id = ac_obj.account_creation(cr,uid,rec.name,ac_type,rec.id,entry_mode,internal_type,note,context=context)
+				#~ if rec.supplier == True:
+					#~ internal_type = 'payable'
+					#~ note = 'New Supplier Added'
+				#~ if rec.dealer == True:
+					#~ internal_type = 'payable'
+					#~ note = 'New Delear Added'
+				#~ if rec.contractor == True:
+					#~ internal_type = 'payable'
+					#~ note = 'New Contractor Added'
+				#~ if rec.supplier == True or rec.dealer == True or rec.contractor == True:
+					#~ ac_type_ids = self.pool.get('account.account.type').search(cr,uid,[('name','=','Liability')])
+					#~ if ac_type_ids:
+						#~ ac_type_rec = self.pool.get('account.account.type').browse(cr,uid,ac_type_ids[0])
+						#~ ac_type = ac_type_rec.id
+					#~ account_payable_id = ac_obj.account_creation(cr,uid,rec.name,ac_type,rec.id,entry_mode,internal_type,note,context=context)
+				#~ 
+				#~ self.write(cr, uid, ids, {'property_account_receivable':account_receivable_id,'property_account_payable':account_payable_id})
 			
 			## Account master creation process end
 			

@@ -86,9 +86,6 @@
 				<group>	
 					<field name="remark" attrs="{'readonly': [('partner_state','in',['validated'])]}"/>
 				</group>
-				<group>												
-					<field name="cancel_remark" attrs="{'invisible':[('partner_state','not in',['validated'])]}"/>
-				</group>
 			</group>
 		</xpath>
 		
@@ -377,6 +374,9 @@
 	
 	<!-- Dealer Master -->
 	<menuitem action="m_action_dealer_form" id="cam_crm_dealer_master" name="Dealer" parent="parent_menus.mrm_contacts_masters" sequence="3"/>
+	
+	<!-- Employee Master -->
+	<menuitem action="hr.open_view_employee_list_my" id="cam_crm_emp_master" name="Employees" parent="parent_menus.mrm_contacts_masters" sequence="4"/>
 	
 	
     </data>

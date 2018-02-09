@@ -109,7 +109,7 @@
 		
 		<!-- Menu Name Start here --> 
 		
-			<menuitem action="mma_m_brand" name="Brand" id="mam_m_brand" parent="parent_menus.mrm_po_inv_masters" sequence="1"/>
+			<menuitem action="mma_m_brand" name="Brand" id="mam_m_brand" parent="parent_menus.mrm_po_inv_masters" sequence="2"/>
 		
 		<!-- Menu Name End here --> 
 

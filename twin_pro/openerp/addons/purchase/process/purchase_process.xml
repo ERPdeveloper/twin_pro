@@ -94,6 +94,7 @@
             <field eval="0" name="flow_start"/>
         </record>
 
+<!--
         <record id="process_node_packinglist0" model="process.node">
             <field name="menu_id" ref="stock.menu_action_picking_tree4"/>
             <field name="model_id" ref="stock.model_stock_picking"/>
@@ -104,6 +105,7 @@
             <field eval="&quot;&quot;&quot;object.state=='assigned'&quot;&quot;&quot;" name="model_states"/>
             <field eval="0" name="flow_start"/>
         </record>
+-->
 
         <record id="process_node_invoiceafterpacking0" model="process.node">
             <field name="menu_id" ref="account.menu_finance_receivables"/>
@@ -192,6 +194,7 @@
             <field eval="[(6,0,[ref('purchase.trans_router_invoice')])]" name="transition_ids"/>
         </record>
 
+<!--
         <record id="process_transition_createpackinglist0" model="process.transition">
             <field eval="[(6,0,[])]" name="transition_ids"/>
             <field eval="&quot;&quot;&quot;Pick list generated&quot;&quot;&quot;" name="name"/>
@@ -199,7 +202,9 @@
             <field model="process.node" name="target_node_id" ref="process_node_packinglist0"/>
             <field model="process.node" name="source_node_id" ref="process_node_approvepurchaseorder0"/>
         </record>
+-->
 
+<!--
         <record id="process_transition_invoicefrompackinglist0" model="process.transition">
             <field eval="[(6,0,[])]" name="transition_ids"/>
             <field eval="&quot;&quot;&quot;Invoice&quot;&quot;&quot;" name="name"/>
@@ -207,6 +212,7 @@
             <field model="process.node" name="target_node_id" ref="process_node_invoiceafterpacking0"/>
             <field model="process.node" name="source_node_id" ref="process_node_packinglist0"/>
         </record>
+-->
 
         <record id="process_transition_purchaseinvoice0" model="process.transition">
             <field eval="[(6,0,[])]" name="transition_ids"/>
