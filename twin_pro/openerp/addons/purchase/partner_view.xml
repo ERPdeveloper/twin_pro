@@ -77,10 +77,10 @@
                     <button name="%(purchase.act_res_partner_2_purchase_order)d" type="action"
                         string="Purchase Orders"
                         attrs="{'invisible': [('supplier', '=', False)]}"
-                        groups="purchase.group_purchase_user"/>
+                        groups="purchase.group_purchase_user" invisible="1"/>
                     <button name="%(purchase.act_res_partner_2_supplier_invoices)d" type="action"
                         attrs="{'invisible': [('supplier', '=', False)]}"
-                        string="Supplier Invoices"/>
+                        string="Supplier Invoices" invisible="1"/>
                 </xpath>
             </field>
         </record>

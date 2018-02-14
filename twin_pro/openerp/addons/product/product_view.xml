@@ -187,7 +187,7 @@
 								</group>
 							</group>
 						</page>
-						<page string="Sales" attrs="{'invisible':[('sale_ok','=',False)]}">
+						<page string="Sales" attrs="{'invisible':[('sale_ok','=',False)]}" invisible="1">
 							<group name="sale">
 								<group string="Sale Conditions">
 									<label for="warranty"/>
@@ -886,7 +886,7 @@
                             </group>
 
                         </page>
-                        <page string="Suppliers">
+                        <page string="Suppliers" invisible="1">
                             <field name="seller_ids"/>
                         </page>
                         <page string="Descriptions">
