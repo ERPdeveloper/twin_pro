@@ -19,7 +19,7 @@ class t_crm_enquiry(osv.osv):
 		'name': fields.char('Enquiry No',size=30,select=True,readonly=True),
 		'enquiry_date': fields.date('Enquiry Date',required=True),
 		'notes': fields.text('Notes'),
-		'state': fields.selection([('draft','Draft'),('validated','Validated'),('rejected','Rejected')],'Status', readonly=True),
+		'state': fields.selection([('moq','Moved to Quote'),('draft','Draft'),('validated','Validated'),('rejected','Rejected')],'Status', readonly=True),
 		'remark': fields.char('Rejected For'),
 		'source_mode': fields.selection([('auto','Auto'),('manual','Manual')],'Source Mode', readonly=True),
 		
@@ -51,6 +51,8 @@ class t_crm_enquiry(osv.osv):
 		'rejected_user_id': fields.many2one('res.users', 'Rejected By', readonly=True),
 		'updated_date': fields.datetime('Recent Update On', readonly=True),
 		'updated_user_id': fields.many2one('res.users', 'Recent Update By', readonly=True),
+		'moq_date': fields.datetime('Moved to Quote On', readonly=True),
+		'moq_user_id': fields.many2one('res.users', 'Moved to Quote By', readonly=True),
 		
 	}
 	
@@ -78,6 +80,51 @@ class t_crm_enquiry(osv.osv):
 		
        ]
 	
+	def move_to_quote(self,cr,uid,ids,context=None):
+		rec = self.browse(cr,uid,ids[0])
+		#~ if rec.state='validated':
+		customer_rec = self.pool.get('res.partner').browse(cr,uid,rec.customer_id.id)
+		enq_data = {
+			'customer_id': customer_rec.id,
+			'address': customer_rec.street,
+			'state_id': customer_rec.state_id.id,
+			'city_id': customer_rec.city_id.id,
+			'segment': rec.segment,
+			'delivery_date': rec.delivery_date,
+			'expected_date': rec.expected_date,
+			'expected_value': rec.expected_value,
+			'source_mode':'auto'
+		}
+		print "enq_dataenq_dataenq_data",enq_data
+		quotation_id = self.pool.get('t.crm.quotation').create(cr, uid, enq_data, context=context)
+		taxes = []
+		for lines in rec.line_ids:
+			if lines.product_id.id:
+				product_rec = self.pool.get('product.product').browse(cr,uid,lines.product_id.id)
+				taxes=[]
+				if product_rec.hsn_no.id:
+					hsn_rec = self.pool.get('m.hsn.code').browse(cr,uid,product_rec.hsn_no.id)
+					print "header_id.state_idheader_id.state_idheader_id.state_id",customer_rec.state_id.id
+					if customer_rec.state_id.code == 'TND':
+						taxes = [hsn_rec.sgst_tax_id.id,hsn_rec.cgst_tax_id.id]
+					else:
+						taxes = [hsn_rec.igst_tax_id.id]
+					print "taxestaxestaxestaxestaxes",taxes
+				enq_line={
+					
+					'header_id':quotation_id,
+					'product_id':lines.product_id.id,
+					'uom_id':lines.uom_id.id,
+					'brand_id':lines.brand_id.id,
+					'taxes_id':[(6, 0, taxes)],
+					'qty':lines.qty,
+					
+					}
+				quotation_line_id = self.pool.get('ch.crm.quotation').create(cr, uid, enq_line, context=context)
+			self.write(cr, uid, ids, {'state': 'moq','moq_user_id': uid, 'moq_date': time.strftime('%Y-%m-%d %H:%M:%S')})
+		
+		return True
+		
 	def entry_validate(self,cr,uid,ids,context=None):
 		
 		rec = self.browse(cr,uid,ids[0])

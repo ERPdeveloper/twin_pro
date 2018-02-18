@@ -105,8 +105,8 @@
 							<group>
 								<group>
 									<field name="type" attrs="{'readonly':[('state','in',('validated','reject'))]}" invisible="1"/>
-									<field name="uom_id" on_change="onchange_uom(uom_id,uom_po_id)" groups="product.group_uom" attrs="{'readonly':[('state','=','validated')]}"/>
-									<field name="uom_po_id" on_change="onchange_po_uom(uom_id,uom_po_id)" groups="product.group_uom" attrs="{'readonly':[('state','=','validated')]}"/>
+									<field name="uom_id" on_change="onchange_uom(uom_id,uom_po_id)" attrs="{'readonly':[('state','=','validated')]}"/>
+									<field name="uom_po_id" on_change="onchange_po_uom(uom_id,uom_po_id)" attrs="{'readonly':[('state','=','validated')]}"/>
 									<field name="list_price" attrs="{'readonly':[('state','in',('validated','reject'))]}"/>
 									<field name="qty_available" attrs="{'readonly':[('state','in',('validated','reject'))]}" invisible="1"/>                                        
 								</group>

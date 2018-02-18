@@ -118,7 +118,7 @@ class m_product(osv.osv):
 	def entry_validate(self,cr,uid,ids,context=None):
 		rec = self.browse(cr, uid, ids[0])
 		if rec.state == 'draft':
-			self.write(cr, uid, ids, {'state': 'validated','app_user_id': uid, 'approve_date': time.strftime('%Y-%m-%d %H:%M:%S')})
+			self.write(cr, uid, ids, {'state': 'validated','validated_user_id': uid, 'validated_date': time.strftime('%Y-%m-%d %H:%M:%S')})
 		return True
 	
 	def entry_revert(self,cr,uid,ids,context=None):

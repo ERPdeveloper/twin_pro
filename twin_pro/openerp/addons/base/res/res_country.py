@@ -200,11 +200,11 @@ class CountryState(osv.osv):
 		vals.update({'updated_date': time.strftime('%Y-%m-%d %H:%M:%S'),'updated_user_id':uid})
 		return super(CountryState, self).write(cr, uid, ids, vals, context)
     
-    def create(self, cursor, user, vals, context=None):
-		if vals.get('code'):
-			vals['code'] = vals['code'].upper()
-		return super(Country, self).create(cursor, user, vals,
-				context=context)
+    #~ def create(self, cursor, user, vals, context=None):
+		#~ if vals.get('code'):
+			#~ vals['code'] = vals['code'].upper()
+		#~ return super(Country, self).create(cursor, user, vals,
+				#~ context=context)
     
     def unlink(self,cr,uid,ids,context=None):
 		unlink_ids = []
@@ -292,11 +292,11 @@ class city(osv.osv):
 		vals.update({'updated_date': time.strftime('%Y-%m-%d %H:%M:%S'),'updated_user_id':uid})
 		return super(city, self).write(cr, uid, ids, vals, context)
     
-    def create(self, cursor, user, vals, context=None):
-		if vals.get('code'):
-			vals['code'] = vals['code'].upper()
-		return super(Country, self).create(cursor, user, vals,
-				context=context)
+    #~ def create(self, cursor, user, vals, context=None):
+		#~ if vals.get('code'):
+			#~ vals['code'] = vals['code'].upper()
+		#~ return super(Country, self).create(cursor, user, vals,
+				#~ context=context)
     
     def unlink(self,cr,uid,ids,context=None):
 		unlink_ids = []

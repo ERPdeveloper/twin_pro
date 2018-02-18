@@ -11,7 +11,7 @@
         <field name="arch" type="xml">
 		
 		<field name="categ_id" position="after">
-			<field name="hsn_no" required="1"/>
+			<field name="hsn_no" attrs="{'readonly':[('state','=','validated')]}" required="1"/>
 			<field name="capital" invisible="1"/>
 		</field>
 				
@@ -39,6 +39,8 @@
 		<field name="uom_id" position="before">
 		<field name="product_type"/>
 		<field name="uom_conversation_factor" attrs="{'readonly':[('state','=','validated')]}"/>
+		<field name="uom_id" attrs="{'readonly':[('state','=','validated')]}"/>
+		<field name="uom_po_id" attrs="{'readonly':[('state','=','validated')]}"/>
 		</field>
 		
 		<field name="stock_in_hand" position="after">
