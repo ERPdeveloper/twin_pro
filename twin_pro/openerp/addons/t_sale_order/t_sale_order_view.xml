@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+	
+	<!-- Form View Start -->
+		
+		<record id="t_form_v_t_sale_order" model="ir.ui.view">
+			<field name="name">Sale Order</field>
+			<field name="model">t.sale.order</field>
+			<field name="arch" type="xml">
+				<form string="Sale Order" version="7.0">
+					<header>
+						<button name="entry_validate" type="object" string="Validate" states="draft" class="oe_highlight" confirm="Are you sure to proceed ?"/>
+						<button name="entry_reject" type="object" string="Reject" states="validated" class="oe_highlight" confirm="Are you sure to proceed ?"/>
+					</header>
+						<group>
+							<group>
+								<field name="name"/>
+								<field name="customer_id" on_change="onchange_customer_id(customer_id)" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+								<field name="order_type" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+							</group>
+							<group>
+								<field name="so_date" options="{'datepicker':{'minDate': -5}}" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+								<field name="delivery_date" options="{'datepicker':{'minDate': -5}}" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+								<field name="quotation_id" on_change="onchange_quotation_id(quotation_id)" attrs="{'readonly':[('state','not in',['draft'])],'invisible':[('order_type','!=','quotation')],'required':[('order_type','=','quotation')]}"/>
+								<field name="state" style="width: 30%%" class="att_state_change"/>
+							</group>
+						</group>
+						<notebook>
+							<page string="Product Details">
+								<field name="line_ids" colspan="4" nolabel="1" attrs="{'readonly':[('state','in',['validated'])]}">
+									<tree string="Stock Inward Details Entry Tree" editable="top">
+										<field name="product_id" on_change="onchange_product_id(product_id)"/>
+										<field name="uom_id" required="1"/>
+										<field name="brand_id"/>
+										<field name="unit_price" required="1"/>
+										<field name="qty"/>
+										<field name="taxes_id" widget="many2many_tags"/>
+										<field name="sub_total"/>
+										<field name="active" invisible="1"/>
+									</tree>
+								</field>
+							</page>
+							<page string="Log Info">
+								<group>
+									<group>
+										<field name="company_id"/>
+									</group>
+									<group>
+										<field name="active"/>
+									</group>
+									<group>
+										<field name="crt_user_id"/>
+										<field name="validated_user_id" attrs="{'invisible':[('state','in',['draft'])]}"/>
+										<field name="rejected_user_id" attrs="{'invisible':[('state','not in',['rejected'])]}"/>
+										<field name="updated_user_id"/>
+									</group>
+									<group>
+										<field name="crt_date"/>
+										<field name="validated_date" attrs="{'invisible':[('state','in',['draft'])]}"/>
+										<field name="rejected_date" attrs="{'invisible':[('state','not in',['rejected'])]}"/>
+										<field name="updated_date"/>
+										<field name="source_mode"/>
+									</group>
+								</group>
+							</page>
+						</notebook>
+						<group class="oe_subtotal_footer oe_right">
+							<field name="amount_untaxed" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+							<field name="amount_tax" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+							<div class="oe_subtotal_footer_separator oe_inline">
+								<label for="amount_total"/>
+								<button name="button_dummy"
+									states="draft" string="(update)" type="object" class="oe_edit_only oe_link"/>
+							</div>
+							<field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+						</group>
+						<field name="notes" placeholder="Reference Notes" attrs="{'readonly': [('state','in',['rejected'])]}"/>
+					</form>
+			</field>
+		</record>
+		
+	<!-- Form View End -->
+	
+	<!-- Tree View Start -->
+		
+		<record id="t_tree_v_t_sale_order" model="ir.ui.view">
+			<field name="name">Sale Order</field>
+			<field name="model">t.sale.order</field>
+			<field eval="8" name="priority"/>
+			<field name="arch" type="xml">
+				<tree colors="blue:state == 'draft';black:state == 'validated';gray:state == 'rejected'" toolbar="True" string="Sale Order">
+					<field name="name"/>
+					<field name="so_date"/>
+					<field name="customer_id"/>
+					<field name="state"/>
+				</tree>
+			</field>
+		</record>
+		
+	<!-- Tree View End -->
+	
+	<!-- Search View Start -->
+		
+		<record id="t_search_v_t_sale_order" model="ir.ui.view">
+            <field name="name">Sale Order Search</field>
+            <field name="model">t.sale.order</field>
+            <field name="arch" type="xml">
+                <search string="Sale Order">
+					<field name="name" string="SO No"  filter_domain="[('name','ilike',self)]" />
+					<filter icon="terp-check" name="draft" string="Draft" domain="[('state','=','draft')]"/>
+					<filter icon="terp-check" name="validated" string="Validted" domain="[('state','=','validated')]"/>
+					<filter icon="terp-check" name="rejected" string="Rejected" domain="[('state','=','rejected')]"/>
+					<separator/>
+                    <group expand="0" string="Group By...">
+						<filter string="Customer" icon="terp-gtk-select-all" domain="[]" context="{'group_by':'customer_id'}"/>
+                        <filter string="Status" icon="terp-gtk-select-all" domain="[]" context="{'group_by':'state'}"/>
+					</group>
+                </search>
+			</field>
+		</record>
+		
+	<!-- Search View End -->
+	
+	<!-- Sequence Starts -->
+	
+		<record forcecreate="1" id="seq_t_sale_order" model="ir.sequence.type">	
+			<field name="name">Sale Order</field>
+			<field name="code">t.sale.order</field>
+		</record>
+
+		<record forcecreate="1" id="t_sale_order" model="ir.sequence">
+		  <field name="name">Sale Order</field>
+		  <field name="code">t.sale.order</field>
+		  <field name="padding" eval="3"/>
+		  <field name="prefix">SO/%(year)s/</field>
+		  <field name="reset_sequence">fiscal_reset</field>
+		</record>
+	
+	<!-- Sequence Ends -->
+	
+	<!-- Menu Action Start-->
+		
+		<record id="tma_t_sale_order" model="ir.actions.act_window">
+			<field name="name">Sale Order</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">t.sale.order</field>
+			<field name="view_type">form</field>
+			<field name="context">{}</field>
+			<field name="view_id" ref="t_tree_v_t_sale_order"/>
+			<field name="search_view_id" ref="t_search_v_t_sale_order"/>
+			<field name="context">{"search_default_draft":1}</field>
+		</record>
+		
+	<!-- Menu Action End-->
+	
+	<!-- Menu Item Start -->
+	
+		<menuitem action="tma_t_sale_order" id="tam_t_sale_order" parent="parent_menus.trm_enquiry" sequence="3"/>
+	
+	<!-- Menu Item End -->
+
+	</data>
+</openerp>
