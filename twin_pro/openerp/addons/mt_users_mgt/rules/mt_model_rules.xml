@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data noupdate="0">
+
+<!--
+	<record id="rule_general_grn" model="ir.rule">
+		<field name="name">General GRN</field>
+		<field name="model_id" ref="kg_general_grn.model_kg_general_grn"/>
+		<field name="domain_force">[('dep_name','in',[user.dep_name.id])]</field>
+		<field name="groups" eval="[(4, ref('erp_admin_access'))]"/>
+		<field eval="1" name="perm_unlink"/>
+		<field eval="1" name="perm_write"/>
+		<field eval="1" name="perm_read"/>
+		<field eval="1" name="perm_create"/>
+    </record>
+    
+	<record id="rule_po_grn_dept" model="ir.rule">
+		<field name="name">PO GRN</field>
+		<field name="model_id" ref="kg_po_grn.model_kg_po_grn"/>
+		<field name="domain_force">[('department_id','=',user.dep_name.id)]</field>
+		<field name="groups" eval="[(4, ref('erp_admin_access'))]"/>
+		<field eval="1" name="perm_unlink"/>
+		<field eval="1" name="perm_write"/>
+		<field eval="1" name="perm_read"/>
+		<field eval="1" name="perm_create"/>
+    </record>
+-->
+	
+
+</data>
+</openerp>

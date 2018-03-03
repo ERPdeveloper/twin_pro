@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+<data noupdate="0">
+	
+	<record id="erp_admin_access" model="res.groups">
+        <field name="name">ERP Admin</field>
+        <field name="category_id" ref="base.module_category_warehouse_management"/>
+        <field name="custom_group">True</field>
+        <field name="implied_ids" eval="[(4, ref('stock.group_stock_user'))]"/>
+        <field eval="[(6,0,[
+					  ref('base.menu_purchase_root'),
+					])]" name="menu_access"/>
+		<field name="users" eval="[(4, ref('base.user_root'))]"/>
+    </record>
+	
+</data>
+</openerp>

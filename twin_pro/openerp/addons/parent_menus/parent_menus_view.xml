@@ -9,8 +9,10 @@
 			<menuitem name="Purchase-Inventory" parent="mpm_masters" id="mrm_po_inv_masters" sequence="2"/>
 			<menuitem name="Taxes" parent="mpm_masters" id="mrm_taxes_masters" sequence="3"/>
 			<menuitem name="General" parent="mpm_masters" id="mrm_general_masters" sequence="4"/>
+			<menuitem name="Users Rights" id="mrm_user_rights" parent = "mpm_masters" sequence="5" />
 		<menuitem name="CRM" id="tpm_crm" sequence="3"/>
 			<menuitem name="Enquiry" parent="tpm_crm" id="trm_enquiry" sequence="1"/>
+		
 
     </data>
 </openerp>
