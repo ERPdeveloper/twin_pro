@@ -52,7 +52,7 @@ class t_sale_order(osv.osv):
 		## Module Requirement Info
 		
 		'customer_id': fields.many2one('res.partner', 'Customer Name',required=True,domain=[('customer','=',True),('partner_state','=','validated')]),
-		'order_type': fields.selection([('direct','Direct'),('quotation','Quotation')],'Order Type',required=True),
+		'order_type': fields.selection([('direct','Direct'),('quotation','From Quotation'),('work','From Work Order')],'Order Type',required=True),
 		'revision': fields.integer('Revision'),
 		'delivery_date': fields.date('Delivery Date',required=True),
 		'expected_date': fields.date('Expected Date'),
@@ -62,6 +62,7 @@ class t_sale_order(osv.osv):
 		'state_id':fields.many2one('res.country.state','State'),
 		#~ 'quotation_id':fields.many2one('t.crm.quotation','Quotation',domain=[('state','=','validated')]),
 		'quotation_id':fields.many2one('t.crm.quotation','Quotation'),
+		'work_id':fields.many2one('t.work.order','WO No'),
 		
 		'amount_untaxed': fields.function(_amount_all, digits_compute= dp.get_precision('Account'), string='Untaxed Amount',
 			store={
@@ -164,6 +165,26 @@ class t_sale_order(osv.osv):
                 quotation_lines.append(quotation_line_vals)
                 print "quotation_linesquotation_linesquotation_lines",quotation_line_vals
 		return {'value': {'line_ids': quotation_lines}}
+		
+	def onchange_work_id(self,cr,uid,ids,work_id,context=None):
+		work_lines = []
+		if work_id:
+			work_rec = self.pool.get('t.work.order').browse(cr,uid,work_id)
+			
+			for lines in work_rec.line_ids:
+				print "linesssssssssssssssssssssssssssssssssss",lines
+				work_line_vals = {
+						'product_id': lines.product_id.id,
+						'uom_id': lines.uom_id.id,
+						'brand_id': lines.brand_id.id,
+						'unit_price': lines.unit_price,
+						'qty': lines.qty,
+						'taxes_id': '',
+						
+                }
+                work_lines.append(work_line_vals)
+                print "work_lineswork_lineswork_lines",work_line_vals
+		return {'value': {'line_ids': work_lines}}
 		
 	
 	def entry_validate(self,cr,uid,ids,context=None):

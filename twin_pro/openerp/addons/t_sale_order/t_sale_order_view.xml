@@ -23,6 +23,7 @@
 								<field name="so_date" options="{'datepicker':{'minDate': -5}}" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="delivery_date" options="{'datepicker':{'minDate': -5}}" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="quotation_id" on_change="onchange_quotation_id(quotation_id)" attrs="{'readonly':[('state','not in',['draft'])],'invisible':[('order_type','!=','quotation')],'required':[('order_type','=','quotation')]}"/>
+								<field name="work_id" on_change="onchange_work_id(work_id)" attrs="{'readonly':[('state','not in',['draft'])],'invisible':[('order_type','!=','work')],'required':[('order_type','=','work')]}"/>
 								<field name="state" style="width: 30%%" class="att_state_change"/>
 							</group>
 						</group>
