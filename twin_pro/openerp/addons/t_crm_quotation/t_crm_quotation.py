@@ -108,15 +108,15 @@ class t_crm_quotation(osv.osv):
 		
 	}
 	
-	def _validations(self, cr, uid, ids, context=None):
-		entry = self.browse(cr,uid,ids[0])
-		if not entry.line_ids:
-			raise osv.except_osv(_('Warning!'),_('Product details should not be empty.'))
-		else:
-			for lines in entry.line_ids:
-				if lines.unit_price <= 0.00:
-					raise osv.except_osv(_('Warning!'),_('Unit Price should not be zero for product (%s)'%(lines.product_id.name_template)))
-		return True
+	#~ def _validations(self, cr, uid, ids, context=None):
+		#~ entry = self.browse(cr,uid,ids[0])
+		#~ if not entry.line_ids:
+			#~ raise osv.except_osv(_('Warning!'),_('Product details should not be empty.'))
+		#~ else:
+			#~ for lines in entry.line_ids:
+				#~ if lines.unit_price <= 0.00:
+					#~ raise osv.except_osv(_('Warning!'),_('Unit Price should not be zero for product (%s)'%(lines.product_id.name_template)))
+		#~ return True
 	
 	_constraints = [
 		
@@ -151,7 +151,6 @@ class t_crm_quotation(osv.osv):
 		## Sequence Number Generation
 		
 		if rec.state == 'draft':
-			self._validations(self,cr,uid,rec.id,context=context)
 			if rec.name == '' or rec.name == False:
 				seq_obj_id = self.pool.get('ir.sequence').search(cr,uid,[('code','=','t.crm.quotation')])
 				seq_rec = self.pool.get('ir.sequence').browse(cr,uid,seq_obj_id[0])
@@ -160,7 +159,12 @@ class t_crm_quotation(osv.osv):
 				entry_name = entry_name[0]
 			else:
 				entry_name = rec.name
-			
+			if not rec.line_ids:
+				raise osv.except_osv(_('Warning!'),_('Product details should not be empty.'))
+			else:
+				for lines in rec.line_ids:
+					if lines.unit_price <= 0.00:
+						raise osv.except_osv(_('Warning!'),_('Unit Price should not be zero for product (%s)'%(lines.product_id.name_template)))
 			self.write(cr, uid, ids, {'name': entry_name,'state': 'validated','validated_user_id': uid, 'validated_date': time.strftime('%Y-%m-%d %H:%M:%S')})
 		
 		return True

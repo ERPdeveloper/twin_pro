@@ -110,15 +110,15 @@ class t_work_order(osv.osv):
 		
 	}
 	
-	def _validations(self, cr, uid, ids, context=None):
-		entry = self.browse(cr,uid,ids[0])
-		if not entry.line_ids:
-			raise osv.except_osv(_('Warning!'),_('Product details should not be empty.'))
-		else:
-			for lines in entry.line_ids:
-				if lines.unit_price <= 0.00:
-					raise osv.except_osv(_('Warning!'),_('Unit Price should not be zero for product (%s)'%(lines.product_id.name_template)))
-		return True
+	#~ def _validations(self, cr, uid, ids, context=None):
+		#~ entry = self.browse(cr,uid,ids[0])
+		#~ if not entry.line_ids:
+			#~ raise osv.except_osv(_('Warning!'),_('Product details should not be empty.'))
+		#~ else:
+			#~ for lines in entry.line_ids:
+				#~ if lines.unit_price <= 0.00:
+					#~ raise osv.except_osv(_('Warning!'),_('Unit Price should not be zero for product (%s)'%(lines.product_id.name_template)))
+		#~ return True
 	
 	_constraints = [
 		
@@ -159,6 +159,7 @@ class t_work_order(osv.osv):
 						'unit_price': lines.unit_price,
 						'qty': lines.qty,
 						'taxes_id': '',
+						'active': True,
 						
                 }
                 quotation_lines.append(quotation_line_vals)
@@ -173,17 +174,22 @@ class t_work_order(osv.osv):
 		## Sequence Number Generation
 		
 		if rec.state == 'draft':
-			self._validations(self,cr,uid,rec.id,context=context)
+			#~ self._validations(self,cr,uid,rec.id,context=context)
 			if rec.name == '' or rec.name == False:
 				seq_obj_id = self.pool.get('ir.sequence').search(cr,uid,[('code','=','t.work.order')])
 				seq_rec = self.pool.get('ir.sequence').browse(cr,uid,seq_obj_id[0])
-				cr.execute(""" select generatesequenceno(%s,'%s','%s') """%(seq_obj_id[0],seq_rec.code,rec.entry_date))
-				entry_name = cr.fetchone();
-				entry_name = entry_name[0]
+				#~ cr.execute(""" select generatesequenceno(%s,'%s','%s') """%(seq_obj_id[0],seq_rec.code,rec.entry_date))
+				#~ entry_name = cr.fetchone();
+				#~ entry_name = entry_name[0]
+			#~ else:
+				#~ entry_name = rec.name
+			if not rec.line_ids:
+				raise osv.except_osv(_('Warning!'),_('Product details should not be empty.'))
 			else:
-				entry_name = rec.name
-			
-			self.write(cr, uid, ids, {'name': entry_name,'state': 'validated','validated_user_id': uid, 'validated_date': time.strftime('%Y-%m-%d %H:%M:%S')})
+				for lines in rec.line_ids:
+					if lines.unit_price <= 0.00:
+						raise osv.except_osv(_('Warning!'),_('Unit Price should not be zero for product (%s)'%(lines.product_id.name_template)))
+			self.write(cr, uid, ids, {'name': 'hai','state': 'validated','validated_user_id': uid, 'validated_date': time.strftime('%Y-%m-%d %H:%M:%S')})
 		
 		return True
 		
@@ -263,18 +269,18 @@ class ch_work_order(osv.osv):
 	}
 	
 	def onchange_product_id(self,cr,uid,ids,product_id,context=None):
-		rec = self.browse(cr,uid,ids[0])
+		#~ rec = self.browse(cr,uid,ids[0])
 		if product_id:
 			product_rec = self.pool.get('product.product').browse(cr,uid,product_id)
-			taxes=[]
-			if product_rec.hsn_no.id:
-				hsn_rec = self.pool.get('m.hsn.code').browse(cr,uid,product_rec.hsn_no.id)
-				print "header_id.state_idheader_id.state_idheader_id.state_id",rec.header_id.state_id.code
-				if rec.header_id.state_id.code == 'TND':
-					taxes = [hsn_rec.sgst_tax_id.id,hsn_rec.cgst_tax_id.id]
-				else:
-					taxes = [hsn_rec.igst_tax_id.id]
-		return {'value': {'uom_id': product_rec.uom_id.id,'taxes_id': taxes}}
+			#~ taxes=[]
+			#~ if product_rec.hsn_no.id:
+				#~ hsn_rec = self.pool.get('m.hsn.code').browse(cr,uid,product_rec.hsn_no.id)
+				#~ print "header_id.state_idheader_id.state_idheader_id.state_id",rec.header_id.state_id.code
+				#~ if rec.header_id.state_id.code == 'TND':
+					#~ taxes = [hsn_rec.sgst_tax_id.id,hsn_rec.cgst_tax_id.id]
+				#~ else:
+					#~ taxes = [hsn_rec.igst_tax_id.id]
+		return {'value': {'uom_id': product_rec.uom_id.id}}
 	
 ch_work_order()
 
