@@ -13,7 +13,7 @@ class m_brand(osv.osv):
 	
 	_columns = {
 		
-		# Basic Info
+		# Basic Info 
 		
 		'name': fields.char('Name',required=True, select=True),
 		'code': fields.char('Code', size=5, required=True),
