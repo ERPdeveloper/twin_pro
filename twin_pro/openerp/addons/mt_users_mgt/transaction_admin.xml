@@ -1,0 +1,119 @@
+<?xml version="1.0" ?>
+<openerp>
+<data noupdate="0">       		
+		
+		<record id="t_crm_admin_customer_master" model="ir.model.access">
+			<field name="model_id" ref="base.model_res_partner"/>
+			<field eval="1" name="perm_read"/>
+			<field name="name">Customer</field>
+			<field eval="1" name="perm_unlink"/>
+			<field eval="1" name="perm_write"/>
+			<field eval="1" name="perm_create"/>
+			<field model="res.groups" name="group_id" search="[('name', '=', u'Transaction Admin')]"/>
+		</record>
+		
+		
+		<record id="t_crm_admin_res_city" model="ir.model.access">
+			<field name="model_id" ref="base.model_res_city"/>
+			<field eval="1" name="perm_read"/>
+			<field name="name">City</field>
+			<field eval="1" name="perm_unlink"/>
+			<field eval="1" name="perm_write"/>
+			<field eval="1" name="perm_create"/>
+			<field model="res.groups" name="group_id" search="[('name', '=', u'Transaction Admin')]"/>
+		</record>
+
+		<record id="t_crm_admin_t_crm_enquiry" model="ir.model.access">
+			<field name="model_id" ref="t_crm_enquiry.model_t_crm_enquiry"/>
+			<field eval="1" name="perm_read"/>
+			<field name="name">t_crm_enquiry</field>
+			<field eval="1" name="perm_unlink"/>
+			<field eval="1" name="perm_write"/>
+			<field eval="1" name="perm_create"/>
+			<field model="res.groups" name="group_id" search="[('name', '=', u'Transaction Admin')]"/>
+		</record>
+
+		<record id="t_crm_admin_ch_crm_enquiry" model="ir.model.access">
+			<field name="model_id" ref="t_crm_enquiry.model_ch_crm_enquiry"/>
+			<field eval="1" name="perm_read"/>
+			<field name="name">ch_crm_enquiry</field>
+			<field eval="1" name="perm_unlink"/>
+			<field eval="1" name="perm_write"/>
+			<field eval="1" name="perm_create"/>
+			<field model="res.groups" name="group_id" search="[('name', '=', u'Transaction Admin')]"/>
+		</record>
+
+		<record id="t_crm_admin_t_sequence_generate_det" model="ir.model.access">
+			<field name="model_id" ref="t_crm_enquiry.model_t_sequence_generate_det"/>
+			<field eval="1" name="perm_read"/>
+			<field name="name">t_sequence_generate_det</field>
+			<field eval="1" name="perm_unlink"/>
+			<field eval="1" name="perm_write"/>
+			<field eval="1" name="perm_create"/>
+			<field model="res.groups" name="group_id" search="[('name', '=', u'Transaction Admin')]"/>
+		</record>
+
+		<record id="t_crm_admin_t_crm_quotation" model="ir.model.access">
+			<field name="model_id" ref="t_crm_quotation.model_t_crm_quotation"/>
+			<field eval="1" name="perm_read"/>
+			<field name="name">t_crm_quotation</field>
+			<field eval="1" name="perm_unlink"/>
+			<field eval="1" name="perm_write"/>
+			<field eval="1" name="perm_create"/>
+			<field model="res.groups" name="group_id" search="[('name', '=', u'Transaction Admin')]"/>
+		</record>
+
+		<record id="t_crm_admin_ch_crm_quotation" model="ir.model.access">
+			<field name="model_id" ref="t_crm_quotation.model_ch_crm_quotation"/>
+			<field eval="1" name="perm_read"/>
+			<field name="name">t_crm_quotation</field>
+			<field eval="1" name="perm_unlink"/>
+			<field eval="1" name="perm_write"/>
+			<field eval="1" name="perm_create"/>
+			<field model="res.groups" name="group_id" search="[('name', '=', u'Transaction Admin')]"/>
+		</record>
+
+		<record id="t_crm_admin_t_sale_order" model="ir.model.access">
+			<field name="model_id" ref="t_sale_order.model_t_sale_order"/>
+			<field eval="1" name="perm_read"/>
+			<field name="name">t_sale_order</field>
+			<field eval="1" name="perm_unlink"/>
+			<field eval="1" name="perm_write"/>
+			<field eval="1" name="perm_create"/>
+			<field model="res.groups" name="group_id" search="[('name', '=', u'Transaction Admin')]"/>
+		</record>
+
+		<record id="t_crm_admin_ch_sale_order" model="ir.model.access">
+			<field name="model_id" ref="t_sale_order.model_ch_sale_order"/>
+			<field eval="1" name="perm_read"/>
+			<field name="name">ch_sale_order</field>
+			<field eval="1" name="perm_unlink"/>
+			<field eval="1" name="perm_write"/>
+			<field eval="1" name="perm_create"/>
+			<field model="res.groups" name="group_id" search="[('name', '=', u'Transaction Admin')]"/>
+		</record>
+
+		<record id="t_crm_admin_t_work_order" model="ir.model.access">
+			<field name="model_id" ref="t_work_order.model_t_work_order"/>
+			<field eval="1" name="perm_read"/>
+			<field name="name">t_work_order</field>
+			<field eval="1" name="perm_unlink"/>
+			<field eval="1" name="perm_write"/>
+			<field eval="1" name="perm_create"/>
+			<field model="res.groups" name="group_id" search="[('name', '=', u'Transaction Admin')]"/>
+		</record>
+
+		<record id="t_crm_admin_ch_work_order" model="ir.model.access">
+			<field name="model_id" ref="t_work_order.model_ch_work_order"/>
+			<field eval="1" name="perm_read"/>
+			<field name="name">ch_work_order</field>
+			<field eval="1" name="perm_unlink"/>
+			<field eval="1" name="perm_write"/>
+			<field eval="1" name="perm_create"/>
+			<field model="res.groups" name="group_id" search="[('name', '=', u'Transaction Admin')]"/>
+		</record>
+
+		
+    </data>
+</openerp>
+	
