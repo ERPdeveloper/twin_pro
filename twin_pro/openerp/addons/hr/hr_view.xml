@@ -203,7 +203,7 @@
             </field>
         </record>
 
-        <menuitem action="open_view_employee_list_my" id="menu_open_view_employee_list_my" sequence="3" parent="menu_hr_main"/>
+        <menuitem action="open_view_employee_list_my" groups="base.group_hr_manager" id="menu_open_view_employee_list_my" sequence="3" parent="menu_hr_main"/>
 
         <record id="ir_ui_view_sc_employee" model="ir.ui.view_sc">
             <field name="name">Employees</field>

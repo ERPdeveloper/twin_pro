@@ -54,7 +54,7 @@
                         <notebook>
                             <page string="Access Rights">
                                 <group >
-                                    <field name="groups_id" domain="[('custom_group','=','t')]"  nolabel="1"/>
+                                    <field name="groups_id" nolabel="1"/>
                                 </group>
                             </page>
                             <page string="Menus" >

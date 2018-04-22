@@ -18,8 +18,8 @@ keep track and order all your purchase orders.
 			
 			'groups_data.xml',
 			'mt_users_view.xml',
-			#~ 'module_access/master_admin.xml',
-			#~ 'module_access/transaction_admin.xml',
+			'master_admin.xml',
+			'transaction_admin.xml',
 			'rules/mt_model_rules.xml',
 			
 			],

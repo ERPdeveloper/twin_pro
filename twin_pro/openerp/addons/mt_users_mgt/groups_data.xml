@@ -2,6 +2,7 @@
 <openerp>
 <data noupdate="0">
 	
+<!--
 	<record id="erp_admin_access" model="res.groups">
         <field name="name">ERP Admin</field>
         <field name="category_id" ref="base.module_category_warehouse_management"/>
@@ -12,6 +13,37 @@
 					])]" name="menu_access"/>
 		<field name="users" eval="[(4, ref('base.user_root'))]"/>
     </record>
+-->
+    
+    
+    
+    <record id="group_master_admin_m" model="res.groups">
+        <field name="name">Master Admin</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="custom_group">True</field> 
+        <field name="category_id" ref="base.module_category_purchase_management"/>
+        <field eval="[(6,0,[
+       			
+			ref('base.menu_base_partner'),
+						
+            ])]" name="menu_access"/>
+
+    </record>
+    
+    <!--Transaction Admin Group-->
+    
+    <record id="group_transaction_admin_m" model="res.groups">
+        <field name="name">Transaction Admin</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="custom_group">True</field>
+        <field name="category_id" ref="base.module_category_purchase_management"/>
+        <field eval="[(6,0,[
+       
+	
+			])]" name="menu_access"/>
+ 
+    </record>
+    
 	
 </data>
 </openerp>

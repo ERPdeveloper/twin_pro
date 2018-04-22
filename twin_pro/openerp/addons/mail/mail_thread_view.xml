@@ -116,7 +116,7 @@
         <!-- Top menu item -->
         <menuitem name="Messaging"
           id="mail.mail_feeds_main"
-          groups="base.group_user"
+          groups="base.group_hr_manager"
           sequence="10"/>
 
         <!-- Left-side menu: Feeds -->
