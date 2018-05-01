@@ -11,6 +11,17 @@
 			<field eval="1" name="perm_create"/>
 			<field model="res.groups" name="group_id" search="[('name', '=', u'Master Admin')]"/>
 		</record>
+		
+		<record id="t_crm_admin_item_nature_master" model="ir.model.access">
+			<field name="model_id" ref="m_item_nature.model_m_item_nature"/>
+			<field eval="1" name="perm_read"/>
+			<field name="name">Item Nature</field>
+			<field eval="1" name="perm_unlink"/>
+			<field eval="1" name="perm_write"/>
+			<field eval="1" name="perm_create"/>
+			<field model="res.groups" name="group_id" search="[('name', '=', u'Master Admin')]"/>
+		</record>
+
 
 		<record id="t_crm_admin_res_city" model="ir.model.access">
 			<field name="model_id" ref="base.model_res_city"/>

@@ -21,6 +21,7 @@
 								<field name="enquiry_by" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="reference" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="segment" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+								<field name="item_nature_id" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="enquiry_status" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 							</group>
 							<group>
@@ -34,8 +35,9 @@
 						</group>
 						<notebook>
 							<page string="Product Details">
-								<field name="line_ids" colspan="4" nolabel="1" attrs="{'readonly':[('state','in',['validated'])]}">
+								<field name="line_ids" context="{'item_nature_id':item_nature_id}" colspan="4" nolabel="1" attrs="{'readonly':[('state','in',['validated'])]}">
 									<tree string="Stock Inward Details Entry Tree" editable="top">
+										<field name="item_nature_id"/>
 										<field name="product_id"/>
 										<field name="uom_id"/>
 										<field name="brand_id"/>

@@ -38,6 +38,7 @@ class t_crm_enquiry(osv.osv):
 		## Child Tables Declaration
 		
 		'line_ids': fields.one2many('ch.crm.enquiry', 'header_id', "Line Details"),
+		'item_nature_id': fields.many2one('m.item.nature','Item Nature',required=True),
 		
 		## Entry Info
 		
@@ -192,6 +193,7 @@ class ch_crm_enquiry(osv.osv):
 		
 		## Module Requirement Fields
 		
+		'item_nature_id': fields.many2one('m.item.nature','Item Nature',required=True),
 		'product_id': fields.many2one('product.product','Product',required=True),
 		'uom_id': fields.many2one('product.uom','UOM',required=True),
 		'brand_id': fields.many2one('m.brand','Brand'),
@@ -200,6 +202,10 @@ class ch_crm_enquiry(osv.osv):
 		## Child Tables Declaration
 		
 	}
+	
+	def default_get(self, cr, uid, fields, context=None):
+		
+		return context
 	
 	_defaults = {
 		
