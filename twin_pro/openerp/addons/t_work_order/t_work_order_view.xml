@@ -18,6 +18,7 @@
 								<field name="name"/>
 								<field name="customer_id" on_change="onchange_customer_id(customer_id)" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="order_type" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+								<field name="stage_id" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 							</group>
 							<group>
 								<field name="so_date" options="{'datepicker':{'minDate': -5}}" attrs="{'readonly':[('state','not in',['draft'])]}"/>

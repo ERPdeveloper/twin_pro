@@ -37,6 +37,7 @@
 									<tree string="Stock Inward Details Entry Tree" editable="top">
 										<field name="product_id" on_change="onchange_product_id(product_id)"/>
 										<field name="uom_id" required="1"/>
+										<field name="item_nature_id" readonly="1"/>
 										<field name="brand_id"/>
 										<field name="unit_price" required="1"/>
 										<field name="qty"/>

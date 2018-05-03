@@ -79,6 +79,7 @@ class t_work_order(osv.osv):
 		## Child Tables Declaration
 		
 		'line_ids': fields.one2many('ch.work.order', 'header_id', "Line Details"),
+		'stage_id': fields.many2one('m.stage', "Stage"),
 		
 		## Entry Info
 		

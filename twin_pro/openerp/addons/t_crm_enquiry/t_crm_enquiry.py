@@ -119,6 +119,7 @@ class t_crm_enquiry(osv.osv):
 					'brand_id':lines.brand_id.id,
 					'taxes_id':[(6, 0, taxes)],
 					'qty':lines.qty,
+					'item_nature_id':lines.item_nature_id.id,
 					
 					}
 				quotation_line_id = self.pool.get('ch.crm.quotation').create(cr, uid, enq_line, context=context)

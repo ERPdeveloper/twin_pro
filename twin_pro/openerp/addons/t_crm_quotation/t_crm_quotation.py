@@ -233,6 +233,7 @@ class ch_crm_quotation(osv.osv):
 		'taxes_id': fields.many2many('account.tax', 'crm_quotation_taxes', 'quotation_id', 'tax_id', 'Taxes'),
 		'sub_total': fields.function(_amount_line, string='Subtotal', digits_compute= dp.get_precision('Account')),
 		'qty': fields.float('Qty',required=True),
+		'item_nature_id': fields.many2one('m.item.nature','Item Nature',required=True),
 		
 		## Child Tables Declaration
 		

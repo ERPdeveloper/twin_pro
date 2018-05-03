@@ -2,7 +2,7 @@
     'name': 'Work Order',
     'version': '0.1',
     'author': 'openerpdevelopers',    
-    'depends' : ['base','product','account'],
+    'depends' : ['base','product','account','m_stage'],
     'description' : """ CRM Quotation track """,
     'category' : 'Sale',
     'data': [
