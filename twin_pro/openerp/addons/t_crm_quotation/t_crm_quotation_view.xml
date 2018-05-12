@@ -8,7 +8,7 @@
 			<field name="name">CRM Quotation</field>
 			<field name="model">t.crm.quotation</field>
 			<field name="arch" type="xml">
-				<form string="Quotation" version="7.0" create="false" delete="false">
+				<form string="Quotation" version="7.0">
 					<header>
 						<button name="entry_validate" type="object" string="Validate" states="draft" class="oe_highlight" confirm="Are you sure to proceed ?"/>
 						<button name="copy" type="object" string="Revise" states="draft" class="oe_highlight" confirm="Are you sure to proceed ?"/>
@@ -28,16 +28,17 @@
 								<field name="delivery_date" options="{'datepicker':{'minDate': -5}}" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="expected_date" options="{'datepicker':{'minDate': -5}}" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="expected_value" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+								<field name="item_nature_id" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="state" style="width: 30%%" class="att_state_change"/>
 							</group>
 						</group>
 						<notebook>
 							<page string="Product Details">
-								<field name="line_ids" colspan="4" nolabel="1" attrs="{'readonly':[('state','in',['validated'])]}">
+								<field name="line_ids" context="{'item_nature_id':item_nature_id}" colspan="4" nolabel="1" attrs="{'readonly':[('state','in',['validated'])]}">
 									<tree string="Stock Inward Details Entry Tree" editable="top">
 										<field name="product_id" on_change="onchange_product_id(product_id)"/>
 										<field name="uom_id" required="1"/>
-										<field name="item_nature_id" readonly="1"/>
+										<field name="item_nature_id"/>
 										<field name="brand_id"/>
 										<field name="unit_price" required="1"/>
 										<field name="qty"/>
@@ -95,7 +96,7 @@
 			<field name="model">t.crm.quotation</field>
 			<field eval="8" name="priority"/>
 			<field name="arch" type="xml">
-				<tree create="false" delete="false" colors="blue:state == 'draft';black:state == 'validated';gray:state == 'rejected'" toolbar="True" string="Quotation">
+				<tree colors="blue:state == 'draft';black:state == 'validated';gray:state == 'rejected'" toolbar="True" string="Quotation">
 					<field name="name"/>
 					<field name="quotation_date"/>
 					<field name="revision"/>

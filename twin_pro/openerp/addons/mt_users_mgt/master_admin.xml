@@ -2,6 +2,16 @@
 <openerp>
 <data noupdate="0">       		
 		
+		<record id="t_crm_admin_annexture_master" model="ir.model.access">
+			<field name="model_id" ref="m_annexture.model_m_annexture"/>
+			<field eval="1" name="perm_read"/>
+			<field name="name">Annexture</field>
+			<field eval="1" name="perm_unlink"/>
+			<field eval="1" name="perm_write"/>
+			<field eval="1" name="perm_create"/>
+			<field model="res.groups" name="group_id" search="[('name', '=', u'Master Admin')]"/>
+		</record>
+		
 		<record id="t_crm_admin_customer_master" model="ir.model.access">
 			<field name="model_id" ref="base.model_res_partner"/>
 			<field eval="1" name="perm_read"/>

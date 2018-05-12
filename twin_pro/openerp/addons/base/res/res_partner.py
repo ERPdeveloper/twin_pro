@@ -289,6 +289,8 @@ class res_partner(osv.osv, format_address):
 		'contact': fields.boolean('Contact'),
 		'code': fields.char('Code'),
 		'partner_state': fields.selection([('draft','Draft'),('validated','Validated'),('rejected','Rejected')],'Status'),
+		'enquiry_type': fields.selection([('arch','ARCH / Er'),('builder','BUILDER'),('int','INT CONTRA')
+		,('dealer','DEALER / FAB'),('carpen','CARPENTER'),('cus','CUSTOMER')],'Enquiry Type'),
 		
 	}
 

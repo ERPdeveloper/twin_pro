@@ -80,6 +80,7 @@ class t_sale_order(osv.osv):
 		## Child Tables Declaration
 		
 		'line_ids': fields.one2many('ch.sale.order', 'header_id', "Line Details"),
+		'line_ids_a': fields.one2many('ch.annexture', 'header_id', "Annexture Details"),
 		
 		## Entry Info
 		
@@ -304,4 +305,41 @@ class ch_sale_order(osv.osv):
 		return {'value': {'uom_id': product_rec.uom_id.id}}
 	
 ch_sale_order()
+
+
+class ch_annexture(osv.osv):
+	
+	_name = "ch.annexture"
+	_description = "Annexture Details"
+	
+	
+	_columns = {
+		
+		## Basic Info
+		
+		'header_id':fields.many2one('t.sale.order','Enquiry No',required=1,ondelete='cascade'),
+		'remark': fields.text('Remarks'),
+		'active': fields.boolean('Active'),
+		
+		## Module Requirement Fields
+		
+		'annexture_id': fields.many2one('m.annexture','Annexture',required=True),
+		'desc': fields.char('Description'),
+		
+		## Child Tables Declaration
+		
+	}
+	
+	_defaults = {
+		
+		'active': True,
+		
+	}
+	
+	def onchange_annexture_id(self,cr,uid,ids,annexture_id,context=None):
+		if annexture_id:
+			product_rec = self.pool.get('m.annexture').browse(cr,uid,annexture_id)
+		return {'value': {'desc': product_rec.code}}
+	
+ch_annexture()
 

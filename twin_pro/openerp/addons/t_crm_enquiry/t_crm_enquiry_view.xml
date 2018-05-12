@@ -17,7 +17,7 @@
 						<group>
 							<group>
 								<field name="name"/>
-								<field name="customer_id" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+								<field name="customer_id" on_change="onchange_customer_id(customer_id)" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="enquiry_by" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="reference" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="segment" attrs="{'readonly':[('state','not in',['draft'])]}"/>
@@ -30,6 +30,7 @@
 								<field name="reminder_date" options="{'datepicker':{'minDate': -5}}" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="expected_date" options="{'datepicker':{'minDate': -5}}" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="expected_value" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+								<field name="enquiry_type" required="1" attrs="{'readonly':[('state','not in',['draft'])]}"/>
 								<field name="state" style="width: 30%%" class="att_state_change"/>
 							</group>
 						</group>

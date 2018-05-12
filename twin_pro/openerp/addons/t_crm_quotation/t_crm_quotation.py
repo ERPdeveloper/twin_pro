@@ -77,6 +77,7 @@ class t_crm_quotation(osv.osv):
 		## Child Tables Declaration
 		
 		'line_ids': fields.one2many('ch.crm.quotation', 'header_id', "Line Details"),
+		'item_nature_id': fields.many2one('m.item.nature','Item Nature'),
 		
 		## Entry Info
 		
@@ -233,7 +234,7 @@ class ch_crm_quotation(osv.osv):
 		'taxes_id': fields.many2many('account.tax', 'crm_quotation_taxes', 'quotation_id', 'tax_id', 'Taxes'),
 		'sub_total': fields.function(_amount_line, string='Subtotal', digits_compute= dp.get_precision('Account')),
 		'qty': fields.float('Qty',required=True),
-		'item_nature_id': fields.many2one('m.item.nature','Item Nature',required=True),
+		'item_nature_id': fields.many2one('m.item.nature','Item Nature'),
 		
 		## Child Tables Declaration
 		
@@ -244,6 +245,11 @@ class ch_crm_quotation(osv.osv):
 		'active': True,
 		
 	}
+	
+	def default_get(self, cr, uid, fields, context=None):
+		
+		return context
+	
 	
 	def onchange_product_id(self,cr,uid,ids,product_id,context=None):
 		rec = self.browse(cr,uid,ids[0])

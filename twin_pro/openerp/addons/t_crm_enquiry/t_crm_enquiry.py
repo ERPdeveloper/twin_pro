@@ -39,6 +39,8 @@ class t_crm_enquiry(osv.osv):
 		
 		'line_ids': fields.one2many('ch.crm.enquiry', 'header_id', "Line Details"),
 		'item_nature_id': fields.many2one('m.item.nature','Item Nature',required=True),
+		'enquiry_type': fields.selection([('arch','ARCH / Er'),('builder','BUILDER'),('int','INT CONTRA')
+		,('dealer','DEALER / FAB'),('carpen','CARPENTER'),('cus','CUSTOMER')],'Enquiry Type'),
 		
 		## Entry Info
 		
@@ -80,6 +82,13 @@ class t_crm_enquiry(osv.osv):
        (_validations, ' Validations of CRM Enquiry ', ['']),
 		
        ]
+	
+	
+	def onchange_customer_id(self,cr,uid,ids,customer_id,context=None):
+		if customer_id:
+			customer_rec = self.pool.get('res.partner').browse(cr,uid,customer_id)
+		return {'value': {'enquiry_type': customer_rec.enquiry_type}}
+	
 	
 	def move_to_quote(self,cr,uid,ids,context=None):
 		rec = self.browse(cr,uid,ids[0])

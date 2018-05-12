@@ -141,6 +141,7 @@
                             <field name="name" class="aplhanum_expect" placeholder="Name" attrs="{'readonly':[('partner_state','=','validated')]}"/>
                             <field name="alias_name" attrs="{'readonly':[('partner_state','=','validated')],'invisible':[('customer','!=',True),('dealer','!=',True),('supplier','!=',True)]}"/>
 							<field name="code" placeholder="Code"  invisible="1" attrs="{'readonly':[('partner_state','=','validated')]}"/>
+							<field name="enquiry_type" required="1" attrs="{'readonly':[('partner_state','=','validated')]}"/>
                         </group>
                         <group>
 							<field name="is_company" on_change="onchange_type(is_company)" class="oe_inline"/>

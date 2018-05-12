@@ -42,6 +42,14 @@
 									</tree>
 								</field>
 							</page>
+							<page string="Annexture Details">
+								<field name="line_ids_a" colspan="4" nolabel="1">
+									<tree string="Annexture Details Entry Tree">
+										<field name="annexture_id" on_change="onchange_annexture_id(annexture_id)"/>
+										<field name="desc"/>
+=									</tree>
+								</field>
+							</page>
 							<page string="Log Info">
 								<group>
 									<group>
