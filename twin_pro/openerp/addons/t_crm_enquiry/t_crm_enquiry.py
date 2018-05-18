@@ -40,7 +40,7 @@ class t_crm_enquiry(osv.osv):
 		'line_ids': fields.one2many('ch.crm.enquiry', 'header_id', "Line Details"),
 		'item_nature_id': fields.many2one('m.item.nature','Item Nature',required=True),
 		'enquiry_type': fields.selection([('arch','ARCH / Er'),('builder','BUILDER'),('int','INT CONTRA')
-		,('dealer','DEALER / FAB'),('carpen','CARPENTER'),('cus','CUSTOMER')],'Enquiry Type'),
+		,('dealer','DEALER / FAB'),('carpen','CARPENTER'),('cus','CUSTOMER')],'Category'),
 		
 		## Entry Info
 		

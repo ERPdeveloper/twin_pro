@@ -28,7 +28,9 @@
 		<field name="is_company" position="replace">
 		<field name="is_company" invisible="1"/>
 		
-		<field name="tin_no" class="aplhanum_expect" required="1" attrs = "{'readonly':[('partner_state','=','validated')]}" string="GSTIN No."/>
+		<field name="tin_no" class="aplhanum_expect" required="1" attrs = "{'readonly':[('partner_state','=','validated')],'required':[('customer','=',True)]}" string="GSTIN No."/>
+		<field name="part_id"  attrs = "{'readonly':[('partner_state','=','validated')]}"/>
+		<field name="emp_id"  attrs = "{'readonly':[('partner_state','=','validated')]}"/>
 		</field>
 		
 		<field name="mobile" position="before">

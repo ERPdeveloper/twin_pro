@@ -78,7 +78,6 @@
             <field name="arch" type="xml">
 <!--                <tree string="Contacts">-->
 					<tree colors="blue:partner_state == 'draft';black:partner_state == 'validated';gray:partner_state == 'rejected'" toolbar="True" string="Contacts Master">
-                    <field name="enquiry_type"/>
                     <field name="name"/>
                     <field name="function" invisible="1"/>
                     <field name="phone"/>
@@ -142,7 +141,6 @@
                             <field name="name" class="aplhanum_expect" placeholder="Name" attrs="{'readonly':[('partner_state','=','validated')]}"/>
                             <field name="alias_name" attrs="{'readonly':[('partner_state','=','validated')],'invisible':[('customer','!=',True),('dealer','!=',True),('supplier','!=',True)]}"/>
 							<field name="code" placeholder="Code"  invisible="1" attrs="{'readonly':[('partner_state','=','validated')]}"/>
-							<field name="enquiry_type" required="1" attrs="{'readonly':[('partner_state','=','validated')]}"/>
                         </group>
                         <group>
 							<field name="is_company" on_change="onchange_type(is_company)" class="oe_inline"/>
@@ -371,7 +369,6 @@
 				   <filter icon="terp-check" name="rejected" string="Rejected" domain="[('partner_state','=','rejected')]"/>
                    <group expand="0" string="Group By...">
                        <filter string="Status" icon="terp-personal" domain="[]" context="{'group_by' : 'partner_state'}" />
-                       <filter string="Enquiry Type" icon="terp-personal" domain="[]" context="{'group_by' : 'enquiry_type'}" />
                    </group>
                </search>
             </field>
@@ -476,7 +473,7 @@
             <field name="view_id" ref="view_partner_tree"/>
             <field name="act_window_id" ref="action_partner_form"/>
         </record>
-        <menuitem id="menu_partner_form" groups="base.group_hr_manager" parent="base.menu_sales" action="action_partner_form" sequence="1"/>
+        <menuitem id="menu_partner_form" parent="base.menu_sales" action="action_partner_form" sequence="1"/>
 
         <record id="action_partner_customer_form" model="ir.actions.act_window">
             <field name="name">Customers</field>

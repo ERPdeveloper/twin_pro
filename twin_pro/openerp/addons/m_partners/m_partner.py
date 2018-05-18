@@ -21,6 +21,8 @@ class m_partner(osv.osv):
 	
 	_columns = {
 	
+	'part_id' : fields.many2one('res.partner','Referenced By'),
+	'emp_id' : fields.many2one('hr.employee','Handled By'),
 	'city_id' : fields.many2one('res.city','City',domain="[('state','=','validated')]"),
 	'tin_no' : fields.char('TIN',size=15),
 	'vat_no' : fields.char('VAT',size=12),
